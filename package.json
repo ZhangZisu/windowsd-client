@@ -1,0 +1,31 @@
+{
+  "name": "windowsd-client",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "repository": "git@github.com:ZhangZisu/windowsd-client.git",
+  "author": "ZhangZisu <admin@zhangzisu.cn>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^12.12.14",
+    "@types/randomstring": "^1.1.6",
+    "@types/socket.io-client": "^1.4.32",
+    "@types/uuid": "^3.4.6",
+    "@types/yargs": "^13.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.9.0",
+    "@typescript-eslint/parser": "^2.9.0",
+    "eslint": "^6.7.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "randomstring": "^1.1.5",
+    "socket.io-client": "^2.3.0",
+    "stun": "^2.1.0",
+    "uuid": "^3.3.3",
+    "yargs": "^15.0.2"
+  }
+}
