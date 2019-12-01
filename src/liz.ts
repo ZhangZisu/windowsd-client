@@ -144,3 +144,19 @@ export async function LizClientActive (deviceID: string, listen: string, baseCfg
   await rpc.invokeAsync(deviceID, 'start_liz_srv', { key, cfg, port: remoteBind.port })
   startLizClient(`:${localBind.port}`, remote.mapped, listen, cfg)
 }
+
+export async function LizClientPassive (deviceID: string, listen: string, baseCfg: BaseLizConfig, rpc: P2PHost) {
+  const key = generate(20)
+  console.log('Using password ' + key)
+
+  const cfg: LizConfig = { key, ...baseCfg }
+
+  const local = await GetMappedAddress()
+  const remote: IMappedAddress = await rpc.invokeAsync(deviceID, 'get_mapped_address')
+  const localBind = ParseAddr(local.bind)
+  const remoteBind = ParseAddr(remote.bind)
+  await rpc.invokeAsync(deviceID, 'send_message', { msg: 'SB233!', repeat: 5, interval: 100, port: remoteBind.port, remote: local.mapped })
+  await SendMessage('SB666!', 5, 100, localBind.port, remote.mapped)
+  await rpc.invokeAsync(deviceID, 'start_liz_srv', { key, cfg, port: remoteBind.port })
+  startLizClient(`:${localBind.port}`, remote.mapped, listen, cfg)
+}
