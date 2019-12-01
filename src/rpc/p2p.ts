@@ -58,7 +58,7 @@ export class P2PHost {
   }
 
   input (msg: any) {
-    if (msg.hasOwnProperty!('m')) {
+    if ('m' in msg) {
       // P2P Request
       this.handleRequest(msg)
     } else {
