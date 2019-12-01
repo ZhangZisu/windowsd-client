@@ -115,7 +115,6 @@ function startLizServer (bind: string, cfg: LizConfig) {
 function startLizClient (bind: string, target: string, listen: string, cfg: LizConfig) {
   const binary = getBinaryPath('client')
   const args = generateClientArgs(bind, target, listen, cfg)
-  console.log(args)
   const cp = spawn(binary, args, { detached: true, stdio: 'ignore', shell: true })
   cp.unref()
 }

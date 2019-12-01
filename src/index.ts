@@ -3,7 +3,7 @@ import { argv } from 'yargs'
 import { P2PHost } from './rpc/p2p'
 import { SRVHost } from './rpc/srv'
 import { RPCGetEnvs } from './rpc/api'
-import { LizClientActive, RPCStartLizServer } from './liz'
+import { LizClientActive, RPCStartLizServer, LizClientPassive } from './liz'
 import { RPCGetMappedAddress, RPCSendMessage } from './nat'
 
 const self = argv.device as string
@@ -29,8 +29,18 @@ srv.invoke('list_devices', undefined, (r) => {
   console.table(r)
 })
 
-if (argv.connect) {
-  LizClientActive(argv.connect as string, ':4080', {}, p2p)
+if (argv.connectActive) {
+  LizClientActive(argv.connectActive as string, ':4080', {}, p2p)
+    .then(() => {
+      console.log('started')
+    })
+    .catch((e: any) => {
+      console.log(e)
+    })
+}
+
+if (argv.connectPassive) {
+  LizClientPassive(argv.connectPassive as string, ':4080', {}, p2p)
     .then(() => {
       console.log('started')
     })
