@@ -5,13 +5,24 @@ import { SRVHost } from './rpc/srv'
 import { RPCGetEnvs } from './rpc/api'
 import { LizClientActive, RPCStartLizServer, LizClientPassive } from './liz'
 import { RPCGetMappedAddress, RPCSendMessage } from './nat'
+import chalk from 'chalk'
 
 const self = argv.device as string
 
 const socket = io('http://api.zhangzisu.cn:8080', { query: { deviceID: self } })
 
 socket.on('connect', () => {
-  console.log('connected!')
+  console.log(chalk.underline.bgRed('IO'), chalk.green('Connected'))
+})
+
+socket.on('error', (e: any) => {
+  console.log(chalk.underline.bgRed('IO'), chalk.red('Error'))
+  console.error(e)
+  process.exit(1)
+})
+
+socket.on('disconnect', () => {
+  console.log(chalk.underline.bgRed('IO'), chalk.yellow('Disconnected'))
 })
 
 const p2p = new P2PHost(self, (msg) => socket.emit('p2p-rpc', msg))
