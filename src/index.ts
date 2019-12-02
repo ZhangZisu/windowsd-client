@@ -24,27 +24,19 @@ p2p.register('send_message', RPCSendMessage)
 const srv = new SRVHost((msg) => socket.emit('srv-rpc', msg))
 socket.on('srv-rpc', srv.input.bind(srv))
 
-srv.invoke('list_devices', undefined, (r) => {
+srv.invoke('list_devices', undefined, async (r) => {
   console.log('List of devices:')
   console.table(r)
+  console.log('Windowsd client')
+  try {
+    if (argv.connectActive) {
+      await LizClientActive(argv.connectActive as string, ':4080', {}, p2p)
+    }
+
+    if (argv.connectPassive) {
+      await LizClientPassive(argv.connectPassive as string, ':4080', {}, p2p)
+    }
+  } catch (e) {
+    console.error(e)
+  }
 })
-
-if (argv.connectActive) {
-  LizClientActive(argv.connectActive as string, ':4080', {}, p2p)
-    .then(() => {
-      console.log('started')
-    })
-    .catch((e: any) => {
-      console.log(e)
-    })
-}
-
-if (argv.connectPassive) {
-  LizClientPassive(argv.connectPassive as string, ':4080', {}, p2p)
-    .then(() => {
-      console.log('started')
-    })
-    .catch((e: any) => {
-      console.log(e)
-    })
-}

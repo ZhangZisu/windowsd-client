@@ -110,6 +110,11 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
+"@zhangzisu/liz@^0.0.1-20191201":
+  version "0.0.1-20191201"
+  resolved "https://registry.yarnpkg.com/@zhangzisu/liz/-/liz-0.0.1-20191201.tgz#91a8e204795dfca264e5715b7cbbad66f3df003d"
+  integrity sha512-pXkLnGN+x5HS7Mw6Lus0Qah1xlB069kgo4i3UF+2TGxrGMhV0aUwExK2xjInFhwCGrHzyVcbUeXMnFSG3szRow==
+
 acorn-jsx@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.1.0.tgz#294adb71b57398b0680015f0a38c563ee1db5384"

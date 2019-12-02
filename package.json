@@ -22,6 +22,7 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "@zhangzisu/liz": "^0.0.1-20191201",
     "randomstring": "^1.1.5",
     "socket.io-client": "^2.3.0",
     "stun": "^2.1.0",
