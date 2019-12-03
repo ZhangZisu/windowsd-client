@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4'
+import { serverConn } from '../transport'
 
 type SRVOutput = (msg: any) => void
 type SRVCallback = (result: any, err: string | undefined) => void
@@ -19,7 +20,7 @@ interface SRVContext {
   cb: SRVCallback
 }
 
-export class SRVHost {
+class SRVHost {
   output: SRVOutput
   contexts: Map<string, SRVContext>
 
@@ -59,3 +60,6 @@ export class SRVHost {
     ctx.cb(msg.r, msg.e)
   }
 }
+
+export const srvHost = new SRVHost((msg) => serverConn.emit('srv-rpc', msg))
+serverConn.on('srv-rpc', srvHost.input.bind(srvHost))

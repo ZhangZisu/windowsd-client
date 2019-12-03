@@ -1,4 +1,6 @@
 import uuid from 'uuid/v4'
+import { cliArgs } from '../cli'
+import { serverConn } from '../transport'
 
 type P2POutput = (msg: any) => void
 type P2PCallback = (result: any, err: string | undefined) => void
@@ -23,7 +25,7 @@ interface P2PContext {
   cb: P2PCallback
 }
 
-export class P2PHost {
+class P2PHost {
   self: string
   output: P2POutput
   contexts: Map<string, P2PContext>
@@ -100,3 +102,6 @@ export class P2PHost {
     this.functions.set(name, func)
   }
 }
+
+export const p2pHost = new P2PHost(cliArgs.device, (msg) => serverConn.emit('p2p-rpc', msg))
+serverConn.on('p2p-rpc', p2pHost.input.bind(p2pHost))
