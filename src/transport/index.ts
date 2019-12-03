@@ -1,6 +1,7 @@
 import io from 'socket.io-client'
 import chalk from 'chalk'
 import { cliArgs } from '../cli'
+import { handle } from '../rpc/host'
 
 const logPrefix = chalk.underline.bgRed.black('Server'.padEnd(8), 'IO')
 
@@ -19,3 +20,11 @@ serverConn.on('error', (e: any) => {
 serverConn.on('disconnect', () => {
   console.log(logPrefix, chalk.yellow('Disconnected'))
 })
+
+serverConn.on('rpc', (msg: any) => {
+  handle(msg)
+})
+
+export function sendRPC (msg: any) {
+  serverConn.emit('rpc', msg)
+}
