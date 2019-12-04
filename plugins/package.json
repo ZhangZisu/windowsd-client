@@ -1,0 +1,6 @@
+{
+  "name": "plugins",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true
+}
