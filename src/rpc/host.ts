@@ -1,30 +1,56 @@
 import uuid from 'uuid/v4'
 import { sendRPC } from '../transport'
+import { invokeLocal } from '../plugin/host'
 
 type RPCCallback = (result: any, error?: Error) => void
 
 const cbs: Map<string, RPCCallback> = new Map()
 
-export async function handle (msg: any) {
+/**
+ * This function is used to handle remote sent messages
+ * @param msg
+ */
+export async function handleRemote (msg: any) {
   if (msg instanceof Array) {
     if (msg.length === 4) {
       // Request
-      // WIP
+      const [asyncID, method, args, cfg] = msg
+      return handleRequest(asyncID, method, args, cfg)
     } else if (msg.length === 3) {
       // Response
       const [asyncID, result, errstr] = msg
-      const cb = cbs.get(asyncID)
-      if (!cb) {
-        console.log(`Missed response: ${asyncID}`)
-        return
-      }
-      if (typeof errstr === 'string') cb(result, new Error(errstr))
-      return cb(result)
+      return handleResponse(asyncID, result, errstr)
     }
   }
 }
 
-export function invoke (method: string, args: any, cfg: any) {
+function handleRequest (asyncID: string, method: string, args: any, cfg: any) {
+  invokeLocal(method, args, cfg).then(result => {
+    sendRPC([asyncID, result, null])
+  }).catch(error => {
+    sendRPC([asyncID, null, error.toString()])
+  })
+}
+
+function handleResponse (asyncID: string, result: any, errstr: any) {
+  const cb = cbs.get(asyncID)
+  if (!cb) {
+    console.log(`Missed response: ${asyncID}`)
+    return
+  }
+  if (typeof errstr === 'string') cb(result, new Error(errstr))
+  return cb(result)
+}
+
+/**
+ * invoke a remote function \
+ * All args will be forwarded to windowsd-server \
+ * A Remote RPC Call will be generated
+ * @param method
+ * @param args
+ * @param cfg
+ */
+export function invokeRemote (method: string, args: any, cfg: any) {
   return new Promise((resolve, reject) => {
     const asyncID = uuid()
     cbs.set(asyncID, (result, error) => {

@@ -1,7 +1,7 @@
 import io from 'socket.io-client'
 import chalk from 'chalk'
 import { cliArgs } from '../cli'
-import { handle } from '../rpc/host'
+import { handleRemote } from '../rpc/host'
 
 const logPrefix = chalk.underline.bgRed.black('Server'.padEnd(8), 'IO')
 
@@ -22,7 +22,7 @@ serverConn.on('disconnect', () => {
 })
 
 serverConn.on('rpc', (msg: any) => {
-  handle(msg)
+  handleRemote(msg)
 })
 
 export function sendRPC (msg: any) {

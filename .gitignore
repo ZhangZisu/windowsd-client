@@ -62,3 +62,8 @@ typings/
 
 # TypeScript build
 build/
+
+# Plugins
+plugins/
+!plugins/index.d.ts
+!plugins/index.js
