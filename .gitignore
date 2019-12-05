@@ -64,6 +64,6 @@ typings/
 build/
 
 # Plugins
-plugins/
-!plugins/index.d.ts
-!plugins/index.js
+/plugins/*
+!/plugins/index.d.ts
+!/plugins/index.js
