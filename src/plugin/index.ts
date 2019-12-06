@@ -2,8 +2,6 @@ import { join } from 'path'
 import { readFileSync } from 'fs'
 import { Plugin } from './host'
 
-import './api'
-
 const pluginDir = join(__dirname, '..', '..', 'plugins')
 const pluginPackage = join(pluginDir, 'package.json')
 const pkg = JSON.parse(readFileSync(pluginPackage).toString())
