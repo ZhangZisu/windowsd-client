@@ -28,3 +28,7 @@ serverConn.on('rpc', (msg: any) => {
 export function sendRPC (msg: any) {
   serverConn.emit('rpc', msg)
 }
+
+serverConn.on('update', (msg: any) => {
+  console.log(logPrefix, 'update', msg)
+})
