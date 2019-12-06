@@ -1,3 +1,4 @@
+const repl = require('repl')
 const io = require('socket.io-client')
 const uuid = require('uuid/v4')
 
@@ -32,6 +33,12 @@ conn.on('rpc', (msg) => {
 const main = async () => {
   const r = await invoke('cli_args')
   console.log(r)
+  global.invoke = invoke
+  const srv = repl.start({ useGlobal: true, prompt: '$ ' })
+  srv.on('exit', () => {
+    console.log('Bye!')
+    process.exit(0)
+  })
 }
 
 main()
