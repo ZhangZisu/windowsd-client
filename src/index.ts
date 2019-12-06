@@ -1,4 +1,4 @@
 import './transport'
 import './rpc'
-import './api'
+import './interface'
 import './plugin'
