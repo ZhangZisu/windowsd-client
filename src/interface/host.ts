@@ -9,6 +9,7 @@ export const instance = io(cliArgs.api)
 console.log(logPrefix, 'listening on', chalk.green(cliArgs.api))
 
 instance.on('connection', (socket) => {
+  console.log(logPrefix, socket.id, socket.request.headers['user-agent'])
   socket.on('rpc', (msg) => {
     const [asyncID, method, args] = msg
     invokeLocal(method, args, { interface: true })
@@ -18,5 +19,8 @@ instance.on('connection', (socket) => {
       .catch(err => {
         return socket.emit('rpc', [asyncID, null, err.toString()])
       })
+  })
+  socket.on('disconnect', () => {
+    console.log(logPrefix, socket.id, 'offline')
   })
 })

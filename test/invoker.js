@@ -1,8 +1,13 @@
 const repl = require('repl')
 const io = require('socket.io-client')
 const uuid = require('uuid/v4')
+var deasync = require('deasync')
 
-const conn = io('http://localhost:5000')
+const conn = io('http://localhost:5000', {
+  extraHeaders: {
+    'user-agent': 'User-Agent: Test/0'
+  }
+})
 
 conn.on('connect', () => {
   console.log('Connected')
@@ -10,17 +15,17 @@ conn.on('connect', () => {
 
 const cbs = new Map()
 
-function invoke (method, args) {
-  return new Promise((resolve, reject) => {
-    const asyncID = uuid()
-    cbs.set(asyncID, (result, error) => {
-      cbs.delete(asyncID)
-      if (error) return reject(error)
-      return resolve(result)
-    })
-    conn.emit('rpc', [asyncID, method, args])
+function invokeAsync (method, args, cb) {
+  const asyncID = uuid()
+  cbs.set(asyncID, (result, error) => {
+    cbs.delete(asyncID)
+    cb(error, result)
   })
+  conn.emit('rpc', [asyncID, method, args])
 }
+
+/* global invoke */
+global.invoke = deasync(invokeAsync)
 
 conn.on('rpc', (msg) => {
   const [asyncID, result, errstr] = msg
@@ -31,10 +36,14 @@ conn.on('rpc', (msg) => {
 })
 
 const main = async () => {
-  const r = await invoke('cli_args')
-  console.log(r)
-  global.invoke = invoke
+  console.log(invoke('cli_args', {}))
   const srv = repl.start({ useGlobal: true, prompt: '$ ' })
+  srv.setupHistory('.invoker.log', (err) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+  })
   srv.on('exit', () => {
     console.log('Bye!')
     process.exit(0)

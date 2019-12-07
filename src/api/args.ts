@@ -1,7 +1,8 @@
 import { cliArgs } from '../cli'
+import { register } from '../plugin/host'
 
-export function RPCCliArgs () {
+register('cli_args', function () {
   return {
     device: cliArgs.device
   }
-}
+})

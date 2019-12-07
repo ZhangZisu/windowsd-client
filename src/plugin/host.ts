@@ -5,6 +5,8 @@ import { cliArgs } from '../cli'
 import { invokeRemote } from '../rpc/host'
 import chalk from 'chalk'
 
+const logPrefix = chalk.bgBlue.black('Plugin', 'Host')
+
 const activePlugins: Map<string, Plugin> = new Map()
 const loadedPlugins: Map<string, Plugin> = new Map()
 
@@ -37,6 +39,7 @@ export class Plugin {
     this.worker = new Worker(this.mainPath, { stdin: false, stdout: true })
     this.worker.on('message', this.handler.bind(this))
     activePlugins.set(this.id, this)
+    console.log(this.logPrefix, 'Actived')
   }
 
   deactive () {
@@ -44,6 +47,7 @@ export class Plugin {
     this.worker.terminate()
     this.worker = undefined
     activePlugins.delete(this.id)
+    console.log(this.logPrefix, 'Deactived')
   }
 
   invoke (method: string, args: any, cfg: any) {
@@ -131,4 +135,28 @@ export async function invokeLocal (method: string, args: any, cfg: any) {
 export function register (name: string, fn: LocalFn) {
   if (fns.has(name)) throw new Error('Duplicate method registeration')
   fns.set(name, fn)
+  console.log(logPrefix, '+', name)
+}
+
+let maintance = false
+const activeBackup: Map<string, Plugin> = new Map()
+
+export function enableMaintance () {
+  if (maintance) throw new Error('Already in maintance mode')
+  maintance = true
+  activePlugins.forEach((v, k) => activeBackup.set(k, v))
+  activeBackup.forEach((v) => v.deactive())
+  console.log(logPrefix, 'Enter maintance mode')
+}
+
+export function disableMaintance () {
+  if (!maintance) throw new Error('Not in maintance mode')
+  maintance = false
+  activeBackup.forEach((v) => v.active())
+  activeBackup.clear()
+  console.log(logPrefix, 'Exit maintance mode')
+}
+
+export function isMaintance () {
+  return maintance
 }
