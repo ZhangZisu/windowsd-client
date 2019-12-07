@@ -67,3 +67,4 @@ build/
 /plugins/*
 !/plugins/index.d.ts
 !/plugins/index.js
+!/plugins/package-example.json
