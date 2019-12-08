@@ -15,17 +15,21 @@ conn.on('connect', () => {
 
 const cbs = new Map()
 
-function invokeAsync (method, args, cb) {
+function invokeAsync (method, args, cfg, cb) {
   const asyncID = uuid()
   cbs.set(asyncID, (result, error) => {
     cbs.delete(asyncID)
     cb(error, result)
   })
-  conn.emit('rpc', [asyncID, method, args])
+  conn.emit('rpc', [asyncID, method, args, cfg])
 }
 
 /* global invoke */
 global.invoke = deasync(invokeAsync)
+/* global il */
+global.il = (method, args) => invoke(method, args, { local: true })
+/* global ir */
+global.ir = (method, args, target) => invoke(method, args, { target })
 
 conn.on('rpc', (msg) => {
   const [asyncID, result, errstr] = msg
@@ -36,7 +40,8 @@ conn.on('rpc', (msg) => {
 })
 
 const main = async () => {
-  console.log(invoke('cli_args', {}))
+  console.log(il('cli_args', {}))
+  console.log(ir('list_devices', {}))
   const srv = repl.start({ useGlobal: true, prompt: '$ ' })
   srv.setupHistory('.invoker.log', (err) => {
     if (err) {
