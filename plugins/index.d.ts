@@ -3,6 +3,9 @@ interface IPluginLoadInfo {
   id: string
 }
 
-declare function load(id: string): IPluginLoadInfo
+declare namespace plugin {
+  function load(id: string): IPluginLoadInfo
+  const dependencies: { [key: string]: string }
+}
 
-export = load
+export = plugin

@@ -1,4 +1,4 @@
-import pluginLoader from '../../plugins'
+import { load } from '../../plugins'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { cliArgs } from '../cli'
@@ -27,7 +27,7 @@ export class Plugin {
   private logPrefix: string
 
   constructor (id: string) {
-    const info = pluginLoader(id)
+    const info = load(id)
     this.mainPath = info.mainPath
     this.id = info.id
     loadedPlugins.set(this.id, this)
