@@ -36,7 +36,7 @@
     "wdc": "bin/index.js"
   },
   "scripts": {
-    "prepare": "node scripts/prepare.js",
+    "prepublishOnly": "node scripts/prepublishOnly.js",
     "postpublish": "node scripts/postpublish.js"
   }
 }
