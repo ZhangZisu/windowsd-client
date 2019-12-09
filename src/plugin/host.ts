@@ -1,10 +1,14 @@
-import { load, dependencies } from '../../plugins'
+import { load, dependencies, pluginDir } from '../../plugins'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { cliArgs } from '../cli'
 import { invokeRemote } from '../rpc/host'
 import chalk from 'chalk'
+import { promisify } from 'util'
+import { exec } from 'child_process'
+import { outPrefix, errPrefix } from './misc'
 
+const execAsync = promisify(exec)
 const logPrefix = chalk.bgBlue.black('Plugin', 'Host')
 
 const activePlugins: Map<string, Plugin> = new Map()
@@ -141,7 +145,7 @@ export function register (name: string, fn: LocalFn) {
 let maintance = true
 const activeBackup: Set<string> = new Set()
 
-export function enableMaintance () {
+export async function enableMaintance () {
   if (maintance) throw new Error('Already in maintance mode')
   maintance = true
   for (const [v, k] of activePlugins) {
@@ -153,9 +157,13 @@ export function enableMaintance () {
   console.log(logPrefix, 'Enter maintance mode')
 }
 
-export function disableMaintance () {
+export async function disableMaintance () {
   if (!maintance) throw new Error('Not in maintance mode')
   maintance = false
+  const cmd = ['npm', 'i', '--registry=https://registry.npm.taobao.org'].join(' ')
+  const { stderr, stdout } = await execAsync(cmd, { cwd: pluginDir })
+  stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
+  stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
   for (const id in dependencies) {
     console.log(logPrefix, `+${id}@${dependencies[id]}`)
     const plugin = new Plugin(id)
@@ -189,8 +197,9 @@ export function deactivePlugin (id: string) {
 
 disableMaintance()
 
-register('enable_maintance', async () => enableMaintance())
-register('disable_maintance', async () => disableMaintance())
+register('enable_maintance', enableMaintance)
+register('disable_maintance', disableMaintance)
+register('is_maintance', isMaintance)
 register('list_plugins', listPlugins)
 register('active_plugin', async function (args) {
   const { id } = args

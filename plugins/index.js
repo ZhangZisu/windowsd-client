@@ -16,6 +16,7 @@ console.log(chalk.blue('Plugin Loader'), base)
 
 const nodeModules = path.join(base, 'node_modules')
 
+exports.pluginDir = base
 exports.dependencies = JSON.parse(fs.readFileSync(path.join(base, 'package.json')).toString()).dependencies
 
 /**

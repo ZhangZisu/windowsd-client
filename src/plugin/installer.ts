@@ -1,43 +1,34 @@
 import { exec } from 'child_process'
-import { pluginDir } from './vars'
 import { register, enableMaintance, disableMaintance } from './host'
+import { pluginDir } from '../../plugins'
+import { promisify } from 'util'
+import { outPrefix, errPrefix } from './misc'
 import chalk = require('chalk')
 
-const outPrefix = chalk.green('STDOUT')
-const errPrefix = chalk.red('STDERR')
+const execAsync = promisify(exec)
 
-export function installPlugins (args: any) {
-  return new Promise<void>((resolve, reject) => {
-    const plugins: string[] = args.plugins
-    if (!(plugins instanceof Array)) return reject(new Error('Bad Arg: plugins'))
-    enableMaintance()
-    const cmd = ['npm', 'i', '--save', '--registry=https://registry.npm.taobao.org', plugins].join(' ')
-    exec(cmd, { cwd: pluginDir }, (err, stdout, stderr) => {
-      disableMaintance()
-      if (err) return reject(err)
-      const logPrefix = chalk.bgBlue.black('Plugin', 'Install')
-      stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
-      stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
-      return resolve()
-    })
-  })
+export async function installPlugins (args: any) {
+  const plugins: string[] = args.plugins
+  if (!(plugins instanceof Array)) throw new Error('Bad Arg: plugins')
+  await enableMaintance()
+  const cmd = ['npm', 'i', '--save', '--registry=https://registry.npm.taobao.org', plugins].join(' ')
+  const { stdout, stderr } = await execAsync(cmd, { cwd: pluginDir })
+  await disableMaintance()
+  const logPrefix = chalk.bgBlue.black('Plugin', 'Install')
+  stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
+  stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
 }
 
-export function uninstallPlugins (args: any) {
-  return new Promise<void>((resolve, reject) => {
-    const plugins: string[] = args.plugins
-    if (!(plugins instanceof Array)) return reject(new Error('Bad Arg: plugins'))
-    enableMaintance()
-    const cmd = ['npm', 'r', '--save', '--registry=https://registry.npm.taobao.org', plugins].join(' ')
-    exec(cmd, { cwd: pluginDir }, (err, stdout, stderr) => {
-      disableMaintance()
-      if (err) return reject(err)
-      const logPrefix = chalk.bgBlue.black('Plugin', 'Uninstall')
-      stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
-      stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
-      return resolve()
-    })
-  })
+export async function uninstallPlugins (args: any) {
+  const plugins: string[] = args.plugins
+  if (!(plugins instanceof Array)) throw new Error('Bad Arg: plugins')
+  await enableMaintance()
+  const cmd = ['npm', 'r', '--save', '--registry=https://registry.npm.taobao.org', plugins].join(' ')
+  const { stdout, stderr } = await execAsync(cmd, { cwd: pluginDir })
+  await disableMaintance()
+  const logPrefix = chalk.bgBlue.black('Plugin', 'Uninstall')
+  stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
+  stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
 }
 
 register('install_plugin', installPlugins)
