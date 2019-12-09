@@ -6,7 +6,7 @@ import { invokeRemote } from '../rpc/host'
 import chalk from 'chalk'
 import { promisify } from 'util'
 import { exec } from 'child_process'
-import { outPrefix, errPrefix } from './misc'
+import { outPrefix, errPrefix, additionalNPMArgs } from './misc'
 
 const execAsync = promisify(exec)
 const logPrefix = chalk.bgBlue.black('Plugin', 'Host')
@@ -160,12 +160,13 @@ export async function enableMaintance () {
 export async function disableMaintance () {
   if (!maintance) throw new Error('Not in maintance mode')
   maintance = false
-  const cmd = ['npm', 'i', '--registry=https://registry.npm.taobao.org'].join(' ')
+  const cmd = ['npm', 'i', ...additionalNPMArgs].join(' ')
   const { stderr, stdout } = await execAsync(cmd, { cwd: pluginDir })
   stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
   stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
-  for (const id in dependencies) {
-    console.log(logPrefix, `+${id}@${dependencies[id]}`)
+  const dep = dependencies()
+  for (const id in dep) {
+    console.log(logPrefix, `+${id}@${dep[id]}`)
     const plugin = new Plugin(id)
     if (activeBackup.has(id)) {
       plugin.active()

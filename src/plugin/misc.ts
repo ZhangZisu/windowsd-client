@@ -1,4 +1,9 @@
-import chalk = require('chalk')
+import chalk from 'chalk'
+import { sync } from 'in-gfw'
 
 export const outPrefix = chalk.green('STDOUT')
 export const errPrefix = chalk.red('STDERR')
+
+export const additionalNPMArgs = process.env.IN_GFW || sync() ? ['--registry=https://registry.npm.taobao.org'] : []
+
+console.log(chalk.bgBlue.black('Plugin'), 'npm', ...additionalNPMArgs)
