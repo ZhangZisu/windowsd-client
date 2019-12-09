@@ -1,4 +1,4 @@
-import { load } from '../../plugins'
+import { load, dependencies } from '../../plugins'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { cliArgs } from '../cli'
@@ -135,24 +135,34 @@ export async function invokeLocal (method: string, args: any, cfg: any) {
 export function register (name: string, fn: LocalFn) {
   if (fns.has(name)) throw new Error('Duplicate method registeration')
   fns.set(name, fn)
-  console.log(logPrefix, '+', name)
+  console.log(logPrefix, 'fn:', name)
 }
 
-let maintance = false
-const activeBackup: Map<string, Plugin> = new Map()
+let maintance = true
+const activeBackup: Set<string> = new Set()
 
 export function enableMaintance () {
   if (maintance) throw new Error('Already in maintance mode')
   maintance = true
-  activePlugins.forEach((v, k) => activeBackup.set(k, v))
-  activeBackup.forEach((v) => v.deactive())
+  for (const [v, k] of activePlugins) {
+    activeBackup.add(v)
+    k.deactive()
+  }
+  activePlugins.clear()
+  loadedPlugins.clear()
   console.log(logPrefix, 'Enter maintance mode')
 }
 
 export function disableMaintance () {
   if (!maintance) throw new Error('Not in maintance mode')
   maintance = false
-  activeBackup.forEach((v) => v.active())
+  for (const id in dependencies) {
+    console.log(logPrefix, `+${id}@${dependencies[id]}`)
+    const plugin = new Plugin(id)
+    if (activeBackup.has(id)) {
+      plugin.active()
+    }
+  }
   activeBackup.clear()
   console.log(logPrefix, 'Exit maintance mode')
 }
@@ -160,3 +170,35 @@ export function disableMaintance () {
 export function isMaintance () {
   return maintance
 }
+
+export function listPlugins () {
+  return [...loadedPlugins.keys()]
+}
+
+export function activePlugin (id: string) {
+  const plugin = loadedPlugins.get(id)
+  if (!plugin) throw new Error('Target is not loaded')
+  plugin.active()
+}
+
+export function deactivePlugin (id: string) {
+  const plugin = loadedPlugins.get(id)
+  if (!plugin) throw new Error('Target is not loaded')
+  plugin.deactive()
+}
+
+disableMaintance()
+
+register('enable_maintance', async () => enableMaintance())
+register('disable_maintance', async () => disableMaintance())
+register('list_plugins', listPlugins)
+register('active_plugin', async function (args) {
+  const { id } = args
+  if (typeof id !== 'string') throw new Error('Bad Arg: id')
+  return activePlugin(id)
+})
+register('deactive_plugin', async function (args) {
+  const { id } = args
+  if (typeof id !== 'string') throw new Error('Bad Arg: id')
+  return deactivePlugin(id)
+})
