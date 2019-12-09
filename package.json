@@ -1,6 +1,6 @@
 {
   "name": "@windowsd/client",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "build/index.js",
   "repository": "git@github.com:ZhangZisu/windowsd-client.git",
   "author": "ZhangZisu <admin@zhangzisu.cn>",
@@ -39,5 +39,8 @@
     "prepublishOnly": "node scripts/prepublishOnly.js",
     "postpublish": "node scripts/postpublish.js",
     "postinstall": "node scripts/postinstall.js"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
