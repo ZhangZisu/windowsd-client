@@ -157,7 +157,7 @@ export async function enableMaintance () {
   console.log(logPrefix, 'Enter maintance mode')
 }
 
-export async function disableMaintance () {
+export async function disableMaintance (cfg?: any) {
   if (!maintance) throw new Error('Not in maintance mode')
   maintance = false
   const cmd = ['npm', 'i', ...additionalNPMArgs].join(' ')
@@ -165,10 +165,11 @@ export async function disableMaintance () {
   stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
   stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
   const dep = dependencies()
+  const loadAll = cfg && cfg.loadAll
   for (const id in dep) {
     console.log(logPrefix, `+${id}@${dep[id]}`)
     const plugin = new Plugin(id)
-    if (activeBackup.has(id)) {
+    if (loadAll || activeBackup.has(id)) {
       plugin.active()
     }
   }
@@ -196,7 +197,7 @@ export function deactivePlugin (id: string) {
   plugin.deactive()
 }
 
-disableMaintance()
+disableMaintance({ loadAll: true })
 
 register('enable_maintance', enableMaintance)
 register('disable_maintance', disableMaintance)

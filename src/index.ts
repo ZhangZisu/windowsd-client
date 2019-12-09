@@ -1,3 +1,4 @@
+import './hello'
 import './transport'
 import './plugin'
 import './rpc'
