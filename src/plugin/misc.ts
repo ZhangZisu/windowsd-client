@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { sync } from 'in-gfw'
+import { sync } from '@zhangzisu/in-gfw'
 
 export const outPrefix = chalk.green('STDOUT')
 export const errPrefix = chalk.red('STDERR')
