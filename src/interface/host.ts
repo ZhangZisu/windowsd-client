@@ -3,6 +3,7 @@ import { cliArgs } from '../cli'
 import chalk from 'chalk'
 import { invokeLocal } from '../plugin/host'
 import { invokeRemote } from '../rpc/host'
+import { resolveDNS } from '../api/dns'
 
 const logPrefix = chalk.underline.bgYellow.black('API'.padEnd(8), 'IO')
 
@@ -17,7 +18,13 @@ instance.on('connection', (socket) => {
     if (cfg.local) {
       p = invokeLocal(method, args, { interface: true })
     } else {
-      p = invokeRemote(method, args, { target: cfg.target, interface: true })
+      if (cfg.target) {
+        const target = resolveDNS(cfg.target)
+        if (!target) return <unknown>socket.emit('rpc', [asyncID, null, 'DNS resolve failed'])
+        p = invokeRemote(method, args, { target, interface: true })
+      } else {
+        p = invokeRemote(method, args, { interface: true })
+      }
     }
     p.then(result => {
       return socket.emit('rpc', [asyncID, result, null])

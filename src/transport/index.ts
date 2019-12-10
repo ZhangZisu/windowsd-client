@@ -2,6 +2,7 @@ import io from 'socket.io-client'
 import chalk from 'chalk'
 import { cliArgs } from '../cli'
 import { handleRemote } from '../rpc/host'
+import { handleSystem } from './system'
 
 const logPrefix = chalk.underline.bgRed.black('Server'.padEnd(8), 'IO')
 
@@ -29,6 +30,4 @@ export function sendRPC (msg: any) {
   serverConn.emit('rpc', msg)
 }
 
-serverConn.on('update', (msg: any) => {
-  console.log(logPrefix, 'update', msg)
-})
+serverConn.on('system', handleSystem)

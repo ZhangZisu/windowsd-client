@@ -1,4 +1,5 @@
 import yargs from 'yargs'
+import { hostname } from 'os'
 
 export const cliArgs = yargs
   .option('api', {
@@ -13,6 +14,10 @@ export const cliArgs = yargs
   .option('server', {
     default: 'http://api.zhangzisu.cn:8080',
     demandOption: true,
+    type: 'string'
+  })
+  .option('hostname', {
+    default: hostname(),
     type: 'string'
   })
   .argv
