@@ -3,7 +3,7 @@ import { cliArgs } from '../cli'
 
 const hosts: Map<string, string> = new Map()
 
-register('dns_udp', async function (args) {
+register('dns_upd', async function (args) {
   const { k, v } = args
   if (typeof k !== 'string') throw new Error('Bad Arg: k')
   if (typeof v !== 'string') throw new Error('Bad Arg: v')
