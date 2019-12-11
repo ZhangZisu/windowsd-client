@@ -12,9 +12,8 @@ export async function handleSystem (msg: any) {
     try {
       const { k, v } = <any> await invokeRemote('dns_upd', { k: cliArgs.hostname, v: cliArgs.device }, { target: deviceID })
       setDNS(k, v)
-      console.log('Remote', deviceID, chalk.green('DNS updated'), `${k}->${v}`)
     } catch (e) {
-      console.log('Remote', deviceID, chalk.red('DO NOT support DNS'))
+      console.log(logPrefix, deviceID, chalk.red('DO NOT support DNS'))
     }
     return
   }
