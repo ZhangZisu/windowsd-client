@@ -1,16 +1,25 @@
 const repl = require('repl')
 const io = require('socket.io-client')
 const uuid = require('uuid/v4')
-var deasync = require('deasync')
+const argv = require('yargs').argv
+const deasync = require('deasync')
 
 const conn = io('http://localhost:5000', {
   extraHeaders: {
     'user-agent': 'User-Agent: Test/0'
+  },
+  query: {
+    deviceID: argv.device
   }
 })
 
 conn.on('connect', () => {
   console.log('Connected')
+})
+
+conn.on('error', (err) => {
+  console.error(err)
+  process.exit(1)
 })
 
 const cbs = new Map()
@@ -41,7 +50,7 @@ conn.on('rpc', (msg) => {
 
 const main = async () => {
   console.log(il('cli_args', {}))
-  console.log(ir('list_devices', {}))
+  console.table(ir('list_devices', {}))
   const srv = repl.start({ useGlobal: true, prompt: '$ ' })
   srv.setupHistory('.invoker.log', (err) => {
     if (err) {

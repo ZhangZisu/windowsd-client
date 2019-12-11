@@ -1,6 +1,8 @@
 import { register } from '../plugin/host'
 import { cliArgs } from '../cli'
 import chalk from 'chalk'
+import { invokeRemote } from '../rpc/host'
+import { isUUID } from '../misc/regexp'
 
 const hosts: Map<string, string> = new Map()
 
@@ -20,7 +22,7 @@ export function setDNS (k: string, v: string) {
 }
 
 export function resolveDNS (name: string) {
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(name)) {
+  if (isUUID.test(name)) {
     return name
   }
   return hosts.get(name)
@@ -31,3 +33,8 @@ register('dns_resolve', async function (args) {
   if (typeof name !== 'string') throw new Error('Bad Arg: name')
   return resolveDNS(name)
 })
+
+export async function updateDNS (id: string) {
+  const { k, v } = <any> await invokeRemote('dns_upd', { k: cliArgs.hostname, v: cliArgs.device }, { target: id })
+  setDNS(k, v)
+}

@@ -1,21 +1,21 @@
 import chalk from 'chalk'
-import { invokeRemote } from '../rpc/host'
-import { cliArgs } from '../cli'
-import { setDNS } from '../api/dns'
+import { updateDNS } from '../api/dns'
 
 const logPrefix = chalk.bgGreen.black.underline('System Notification')
 
 export async function handleSystem (msg: any) {
   if (msg.event === 'online') {
     const deviceID = <string>msg.deviceID
-    console.log(logPrefix, deviceID, 'online')
+    console.log(logPrefix, deviceID, chalk.green('online'))
     try {
-      const { k, v } = <any> await invokeRemote('dns_upd', { k: cliArgs.hostname, v: cliArgs.device }, { target: deviceID })
-      setDNS(k, v)
+      await updateDNS(deviceID)
     } catch (e) {
       console.log(logPrefix, deviceID, chalk.red('DO NOT support DNS'))
     }
     return
+  }
+  if (msg.event === 'offline') {
+    console.log(logPrefix, msg.deviceID, chalk.red('offline'))
   }
   console.log(logPrefix, msg)
 }

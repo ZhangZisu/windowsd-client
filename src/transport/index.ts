@@ -4,7 +4,7 @@ import { cliArgs } from '../cli'
 import { handleRemote } from '../rpc/host'
 import { handleSystem } from './system'
 
-const logPrefix = chalk.underline.bgRed.black('Server'.padEnd(8), 'IO')
+const logPrefix = chalk.underline.bgRed.black('Server IO')
 
 export const serverConn = io(cliArgs.server, { query: { deviceID: cliArgs.device } })
 

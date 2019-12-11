@@ -1,14 +1,20 @@
 import io from 'socket.io'
-import { cliArgs } from '../cli'
 import chalk from 'chalk'
 import { invokeLocal } from '../plugin/host'
 import { invokeRemote } from '../rpc/host'
 import { resolveDNS } from '../api/dns'
+import { server } from './http'
+import { cliArgs } from '../cli'
 
-const logPrefix = chalk.underline.bgYellow.black('API'.padEnd(8), 'IO')
+const logPrefix = chalk.bgYellow.black('Interface Host')
 
-export const instance = io(cliArgs.api)
-console.log(logPrefix, 'listening on', chalk.green(cliArgs.api))
+export const instance = io(server)
+
+instance.use((socket, cb) => {
+  const deviceID = socket.handshake.query.deviceID
+  if (deviceID !== cliArgs.device) return cb(new Error('Bad invoker'))
+  cb()
+})
 
 instance.on('connection', (socket) => {
   console.log(logPrefix, socket.id, socket.request.headers['user-agent'])

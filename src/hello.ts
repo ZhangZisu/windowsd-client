@@ -1,6 +1,4 @@
-import { readFileSync } from 'fs'
-import { join } from 'path'
 import chalk from 'chalk'
+import { packageJson } from './misc/package'
 
-const version = JSON.parse(readFileSync(join(__dirname, '..', 'package.json')).toString()).version
-console.log('Windowsd™ Client', chalk.green(version))
+console.log('Windowsd™ Client', chalk.green(packageJson.version))
