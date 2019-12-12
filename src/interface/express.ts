@@ -28,10 +28,10 @@ app.post(`/${cliArgs.device}/proxy`, (_req, res) => {
   res.status(501).send('Not Implemented')
 })
 
-app.post('/:id/:method', (req, res) => {
+app.use('/:id/:method', (req, res) => {
   if (!endpoints.has(req.params.id)) return <unknown>res.status(400).send('Bad request')
   const ep = endpoints.get(req.params.id)!
   proxy.web(req, res, {
-    target: ep
+    target: `http://${ep}/${req.params.id}/${req.params.method}`
   })
 })

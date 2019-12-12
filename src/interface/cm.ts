@@ -34,7 +34,7 @@ export async function updateDevice (id: string) {
 
 async function testConn (endpoint: string, id: string) {
   try {
-    const result = <boolean> await get(`/${id}`, { host: endpoint, json: true })
+    const result = <boolean> await get(`http://${endpoint}/${id}`, { json: true, timeout: 1000 })
     return result
   } catch (e) {
     return false
