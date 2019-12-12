@@ -1,7 +1,7 @@
 import io from 'socket.io-client'
 import chalk from 'chalk'
 import { cliArgs } from '../cli'
-import { handleRemote } from '../rpc/host'
+import { handleRemote } from '../rpc'
 import { handleSystem } from './system'
 
 const logPrefix = chalk.underline.bgRed.black('Server IO')

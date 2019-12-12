@@ -1,7 +1,7 @@
 import { register } from '../plugin/host'
 import { cliArgs } from '../cli'
 import chalk from 'chalk'
-import { invokeRemote } from '../rpc/host'
+import { invokeRemote } from '../rpc'
 import { isUUID } from '../misc/regexp'
 
 const hosts: Map<string, string> = new Map()

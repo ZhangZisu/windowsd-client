@@ -2,7 +2,7 @@ import { load, dependencies, pluginDir } from '../../plugins'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { cliArgs } from '../cli'
-import { invokeRemote } from '../rpc/host'
+import { invokeRemote } from '../rpc'
 import chalk from 'chalk'
 import { promisify } from 'util'
 import { exec } from 'child_process'
@@ -80,13 +80,7 @@ export class Plugin {
   }
 
   private handleRPCRequest (asyncID: string, method: string, args: any, cfg: any) {
-    let p: Promise<any>
-    if (cfg.local || (typeof cfg.target === 'string' && cfg.target === cliArgs.device)) {
-      p = invokeLocal(method, args, cfg)
-    } else {
-      p = invokeRemote(method, args, cfg)
-    }
-    p.then(result => {
+    invoke(method, args, cfg).then(result => {
       this.worker && this.worker.postMessage({
         asyncID,
         type: 'RPCResponse',
@@ -109,6 +103,14 @@ export class Plugin {
     }
     if (typeof errstr === 'string') return cb(result, new Error(errstr))
     return cb(result)
+  }
+}
+
+export async function invoke (method: string, args: any, cfg: any) {
+  if (cfg.local || (typeof cfg.target === 'string' && cfg.target === cliArgs.device)) {
+    return invokeLocal(method, args, cfg)
+  } else {
+    return invokeRemote(method, args, cfg)
   }
 }
 

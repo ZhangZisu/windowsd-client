@@ -1,4 +1,4 @@
-import { invokeRemote } from '../rpc/host'
+import { invokeRemote } from '../rpc'
 import { get } from 'request-promise-native'
 import chalk from 'chalk'
 

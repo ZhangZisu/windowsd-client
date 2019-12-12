@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { invokeRemote } from './rpc/host'
+import { invokeRemote } from './rpc'
 import { updateDNS } from './api/dns'
 
 const logPrefix = chalk.green('Startup')
