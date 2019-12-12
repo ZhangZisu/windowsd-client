@@ -1,10 +1,9 @@
 import io from 'socket.io'
-import chalk from 'chalk'
-import { invoke } from '../plugin/host'
-import { server } from './http'
-import { cliArgs } from '../cli'
 
-const logPrefix = chalk.bgYellow.black('Interface Host')
+import { invoke } from '@/plugin/host'
+import { server } from '@/interface/http'
+import { cliArgs } from '@/cli'
+import { logInterfaceHost } from '@/misc/logger'
 
 export const instance = io(server)
 
@@ -15,7 +14,7 @@ instance.use((socket, cb) => {
 })
 
 instance.on('connection', (socket) => {
-  console.log(logPrefix, socket.id, socket.request.headers['user-agent'])
+  logInterfaceHost(socket.id, socket.request.headers['user-agent'])
   socket.on('rpc', (msg) => {
     const [asyncID, method, args, cfg] = msg
     invoke(method, args, { interface: true, ...cfg }).then(result => {
@@ -25,6 +24,6 @@ instance.on('connection', (socket) => {
     })
   })
   socket.on('disconnect', () => {
-    console.log(logPrefix, socket.id, 'offline')
+    logInterfaceHost(socket.id, 'offline')
   })
 })

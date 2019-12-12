@@ -1,2 +1,2 @@
-import './host'
-import './installer'
+import '@/plugin/host'
+import '@/plugin/installer'

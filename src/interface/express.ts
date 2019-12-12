@@ -1,10 +1,11 @@
 import express from 'express'
 import { createProxyServer } from 'http-proxy'
-import { packageJson } from '../misc/package'
-import { cliArgs } from '../cli'
-import { endpoints } from './cm'
 import { extensions } from 'webdav-server/lib/index.v2'
-import { DAVServer } from './dav'
+
+import { packageJson } from '@/misc/package'
+import { cliArgs } from '@/cli'
+import { endpoints } from '@/interface/cm'
+import { DAVServer } from '@/interface/dav'
 
 const proxy = createProxyServer()
 

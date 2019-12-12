@@ -1,15 +1,16 @@
-import { load, dependencies, pluginDir } from '../../plugins'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
-import { cliArgs } from '../cli'
-import { invokeRemote } from '../rpc'
-import chalk from 'chalk'
 import { promisify } from 'util'
 import { exec } from 'child_process'
-import { outPrefix, errPrefix, additionalNPMArgs } from './misc'
+
+import { cliArgs } from '@/cli'
+import { invokeRemote } from '@/rpc'
+import { outPrefix, errPrefix, additionalNPMArgs } from '@/plugin/misc'
+
+import { load, dependencies, pluginDir } from '@/../plugins'
+import { logPluginInstance, logPluginHost } from '@/misc/logger'
 
 const execAsync = promisify(exec)
-const logPrefix = chalk.bgBlue.black('Plugin', 'Host')
 
 const activePlugins: Map<string, Plugin> = new Map()
 const loadedPlugins: Map<string, Plugin> = new Map()
@@ -28,14 +29,12 @@ export class Plugin {
 
   private mainPath: string
   private worker?: Worker
-  private logPrefix: string
 
   constructor (id: string) {
     const info = load(id)
     this.mainPath = info.mainPath
     this.id = info.id
     loadedPlugins.set(this.id, this)
-    this.logPrefix = chalk.bgBlueBright.black('Plugin', id)
   }
 
   active () {
@@ -43,7 +42,7 @@ export class Plugin {
     this.worker = new Worker(this.mainPath, { stdin: false, stdout: true })
     this.worker.on('message', this.handler.bind(this))
     activePlugins.set(this.id, this)
-    console.log(this.logPrefix, 'Actived')
+    logPluginInstance(this.id, 'Actived')
   }
 
   deactive () {
@@ -51,7 +50,7 @@ export class Plugin {
     this.worker.terminate()
     this.worker = undefined
     activePlugins.delete(this.id)
-    console.log(this.logPrefix, 'Deactived')
+    logPluginInstance(this.id, 'Deactived')
   }
 
   invoke (method: string, args: any, cfg: any) {
@@ -76,7 +75,7 @@ export class Plugin {
   }
 
   private handleLog (data: any) {
-    console.log(this.logPrefix, ...data)
+    logPluginInstance(this.id, ...data)
   }
 
   private handleRPCRequest (asyncID: string, method: string, args: any, cfg: any) {
@@ -98,7 +97,7 @@ export class Plugin {
   private handleRPCResponse (asyncID: string, result: any, errstr: any) {
     const cb = cbs.get(asyncID)
     if (!cb) {
-      console.log(`Missed response: ${asyncID}`)
+      logPluginInstance(this.id, `Missed response: ${asyncID}`)
       return
     }
     if (typeof errstr === 'string') return cb(result, new Error(errstr))
@@ -141,7 +140,7 @@ export async function invokeLocal (method: string, args: any, cfg: any) {
 export function register (name: string, fn: LocalFn) {
   if (fns.has(name)) throw new Error('Duplicate method registeration')
   fns.set(name, fn)
-  console.log(logPrefix, 'fn:', name)
+  logPluginHost('fn:', name)
 }
 
 let maintance = true
@@ -156,7 +155,7 @@ export async function enableMaintance () {
   }
   activePlugins.clear()
   loadedPlugins.clear()
-  console.log(logPrefix, 'Enter maintance mode')
+  logPluginHost('Enter maintance mode')
 }
 
 export async function disableMaintance (cfg?: any) {
@@ -164,19 +163,19 @@ export async function disableMaintance (cfg?: any) {
   maintance = false
   const cmd = ['npm', 'i', ...additionalNPMArgs].join(' ')
   const { stderr, stdout } = await execAsync(cmd, { cwd: pluginDir })
-  stdout.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, outPrefix, v))
-  stderr.split('\n').filter(v => v.length).forEach(v => console.log(logPrefix, errPrefix, v))
+  stdout.split('\n').filter(v => v.length).forEach(v => logPluginHost(outPrefix, v))
+  stderr.split('\n').filter(v => v.length).forEach(v => logPluginHost(errPrefix, v))
   const dep = dependencies()
   const loadAll = cfg && cfg.loadAll
   for (const id in dep) {
-    console.log(logPrefix, `+${id}@${dep[id]}`)
+    logPluginHost(`+${id}@${dep[id]}`)
     const plugin = new Plugin(id)
     if (loadAll || activeBackup.has(id)) {
       plugin.active()
     }
   }
   activeBackup.clear()
-  console.log(logPrefix, 'Exit maintance mode')
+  logPluginHost('Exit maintance mode')
 }
 
 export function isMaintance () {

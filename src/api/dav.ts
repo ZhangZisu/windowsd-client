@@ -1,6 +1,7 @@
-import { register } from '../plugin/host'
-import { DAVServer } from '../interface/dav'
 import { PhysicalFileSystem } from 'webdav-server/lib/index.v2'
+
+import { register } from '@/plugin/host'
+import { DAVServer } from '@/interface/dav'
 
 register('mount', async function (args: any) {
   const { dst, src } = args

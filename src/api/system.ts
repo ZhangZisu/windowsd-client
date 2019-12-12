@@ -1,6 +1,7 @@
 import { cpus, freemem, hostname, networkInterfaces } from 'os'
-import { register } from '../plugin/host'
-import { cliArgs } from '../cli'
+
+import { register } from '@/plugin/host'
+import { cliArgs } from '@/cli'
 
 register('process_info', function () {
   return {

@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4'
-import { sendRPC } from '../transport'
-import { invokeLocal } from '../plugin/host'
+
+import { sendRPC } from '@/transport'
+import { invokeLocal } from '@/plugin/host'
 
 type RPCCallback = (result: any, error?: Error) => void
 

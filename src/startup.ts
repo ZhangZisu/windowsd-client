@@ -1,8 +1,9 @@
 import chalk from 'chalk'
-import { invokeRemote } from './rpc'
-import { updateDNS } from './api/dns'
-import { updateDeviceLazy } from './interface/cm'
-import { cliArgs } from './cli'
+
+import { invokeRemote } from '@/rpc'
+import { updateDNS } from '@/api/dns'
+import { updateDeviceLazy } from '@/interface/cm'
+import { cliArgs } from '@/cli'
 
 const logPrefix = chalk.green('Startup')
 

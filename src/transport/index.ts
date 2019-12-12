@@ -1,25 +1,25 @@
 import io from 'socket.io-client'
 import chalk from 'chalk'
-import { cliArgs } from '../cli'
-import { handleRemote } from '../rpc'
-import { handleSystem } from './system'
 
-const logPrefix = chalk.underline.bgRed.black('Server IO')
+import { cliArgs } from '@/cli'
+import { handleRemote } from '@/rpc'
+import { logTransportIO } from '@/misc/logger'
+import { handleSystem } from '@/transport/system'
 
 export const serverConn = io(cliArgs.server, { query: { deviceID: cliArgs.device } })
 
 serverConn.on('connect', () => {
-  console.log(logPrefix, chalk.green('Connected'))
+  logTransportIO(chalk.green('Connected'))
 })
 
 serverConn.on('error', (e: any) => {
-  console.log(logPrefix, chalk.red('Error'))
+  logTransportIO(chalk.red('Error'))
   console.error(e)
   process.exit(1)
 })
 
 serverConn.on('disconnect', () => {
-  console.log(logPrefix, chalk.yellow('Disconnected'))
+  logTransportIO(chalk.yellow('Disconnected'))
 })
 
 serverConn.on('rpc', (msg: any) => {

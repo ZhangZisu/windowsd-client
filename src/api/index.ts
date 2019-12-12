@@ -1,3 +1,3 @@
-import './args'
-import './system'
-import './dav'
+import '@/api/args'
+import '@/api/system'
+import '@/api/dav'

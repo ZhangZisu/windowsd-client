@@ -1,8 +1,7 @@
-import { invokeRemote } from '../rpc'
 import { get } from 'request-promise-native'
-import chalk from 'chalk'
 
-const logPrefix = chalk.bgYellow.black('Interface CM')
+import { invokeRemote } from '@/rpc'
+import { logInterfaceCM } from '@/misc/logger'
 
 export const endpoints: Map<string, string> = new Map()
 export const lazyTimeouts: Map<string, NodeJS.Timeout> = new Map()
@@ -16,19 +15,19 @@ export function updateDeviceLazy (id: string) {
 }
 
 export async function updateDevice (id: string) {
-  console.log(logPrefix, 'update', id)
+  logInterfaceCM('update', id)
   try {
     const eps = <string[]> await invokeRemote('endpoints', {}, { target: id })
     for (const ep of eps) {
       if (await testConn(ep, id)) {
         endpoints.set(id, ep)
-        console.log(logPrefix, id, '->', ep)
+        logInterfaceCM(id, '->', ep)
         return
       }
     }
   } catch (e) {
     endpoints.delete(id)
-    console.log(logPrefix, id, 'removed')
+    logInterfaceCM(id, 'removed')
   }
 }
 

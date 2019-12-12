@@ -1,12 +1,10 @@
-import { register } from '../plugin/host'
-import { cliArgs } from '../cli'
-import chalk from 'chalk'
-import { invokeRemote } from '../rpc'
-import { isUUID } from '../misc/regexp'
+import { register } from '@/plugin/host'
+import { cliArgs } from '@/cli'
+import { invokeRemote } from '@/rpc'
+import { isUUID } from '@/misc/regexp'
+import { logAPIDNS } from '@/misc/logger'
 
 const hosts: Map<string, string> = new Map()
-
-const logPrefix = chalk.bgCyan('DNS')
 
 register('dns_upd', async function (args) {
   const { k, v } = args
@@ -18,7 +16,7 @@ register('dns_upd', async function (args) {
 
 export function setDNS (k: string, v: string) {
   hosts.set(k, v)
-  console.log(logPrefix, `${k}->${v}`)
+  logAPIDNS(`${k}->${v}`)
 }
 
 export function resolveDNS (name: string) {
