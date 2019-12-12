@@ -1,7 +1,8 @@
 import { get } from 'request-promise-native'
 
-import { invokeRemote } from '@/rpc'
-import { logInterfaceCM } from '@/misc/logger'
+import { logInterfaceCM } from '@/shared/logger'
+import { invoke } from '@/router'
+import { bus } from '@/shared/bus'
 
 export const endpoints: Map<string, string> = new Map()
 export const lazyTimeouts: Map<string, NodeJS.Timeout> = new Map()
@@ -17,7 +18,7 @@ export function updateDeviceLazy (id: string) {
 export async function updateDevice (id: string) {
   logInterfaceCM('update', id)
   try {
-    const eps = <string[]> await invokeRemote('endpoints', {}, { target: id })
+    const eps = <string[]> await invoke('endpoints', {}, { target: id })
     for (const ep of eps) {
       if (await testConn(ep, id)) {
         endpoints.set(id, ep)
@@ -27,7 +28,6 @@ export async function updateDevice (id: string) {
     }
   } catch (e) {
     endpoints.delete(id)
-    logInterfaceCM(id, 'removed')
   }
 }
 
@@ -39,3 +39,10 @@ async function testConn (endpoint: string, id: string) {
     return false
   }
 }
+
+bus.on('system', (msg) => {
+  if (msg.event === 'online' || msg.event === 'offline') {
+    const deviceID = <string>msg.deviceID
+    updateDeviceLazy(deviceID)
+  }
+})

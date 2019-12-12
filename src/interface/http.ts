@@ -2,7 +2,7 @@ import { createServer } from 'http'
 
 import { app } from '@/interface/express'
 import { cliArgs } from '@/cli'
-import { logInterfaceHTTP } from '@/misc/logger'
+import { logInterfaceHTTP } from '@/shared/logger'
 
 export const server = createServer(app)
 

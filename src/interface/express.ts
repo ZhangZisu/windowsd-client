@@ -2,7 +2,7 @@ import express from 'express'
 import { createProxyServer } from 'http-proxy'
 import { extensions } from 'webdav-server/lib/index.v2'
 
-import { packageJson } from '@/misc/package'
+import { packageJson } from '@/shared/package'
 import { cliArgs } from '@/cli'
 import { endpoints } from '@/interface/cm'
 import { DAVServer } from '@/interface/dav'

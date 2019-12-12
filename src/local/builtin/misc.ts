@@ -1,9 +1,13 @@
 import { cpus, freemem, hostname, networkInterfaces } from 'os'
-
-import { register } from '@/plugin/host'
 import { cliArgs } from '@/cli'
 
-register('process_info', function () {
+export function getCliArgs () {
+  return {
+    device: cliArgs.device
+  }
+}
+
+export function getProcessInfo () {
   return {
     env: process.env,
     cwd: process.cwd(),
@@ -13,18 +17,18 @@ register('process_info', function () {
     platform: process.platform,
     argv: process.argv
   }
-})
+}
 
-register('system_info', function () {
+export function getSystemInfo () {
   return {
     cpus: cpus(),
     mem: freemem(),
     hostname: hostname(),
     network: networkInterfaces()
   }
-})
+}
 
-register('endpoints', function () {
+export function endpoints () {
   const interfaces = networkInterfaces()
   const endpoints = []
   for (const name in interfaces) {
@@ -38,4 +42,4 @@ register('endpoints', function () {
     }
   }
   return endpoints
-})
+}

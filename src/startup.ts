@@ -1,20 +1,18 @@
 import chalk from 'chalk'
 
-import { invokeRemote } from '@/rpc'
-import { updateDNS } from '@/api/dns'
 import { updateDeviceLazy } from '@/interface/cm'
 import { cliArgs } from '@/cli'
+import { invoke } from '@/router'
 
 const logPrefix = chalk.green('Startup')
 
 async function startup () {
   try {
-    const devices = <{ id: string, allowRPC: boolean }[]> await invokeRemote('list_devices', {}, {})
+    const devices = <{ id: string, allowRPC: boolean }[]> await invoke('list_devices', {}, {})
     console.table(devices)
     for (const { id } of devices) {
       if (id === cliArgs.device) continue
       try {
-        await updateDNS(id)
         updateDeviceLazy(id)
       } catch (e) {
         console.log(logPrefix, id, chalk.red('DO NOT support DNS'))

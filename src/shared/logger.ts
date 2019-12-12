@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
-export function logTransportIO (...args: any) {
-  console.log(chalk.bgRed.black('Transport'), chalk.green('IO'), ...args)
+export function logRemoteIO (...args: any) {
+  console.log(chalk.bgRed.black('Remote'), chalk.green('IO'), ...args)
 }
 
 export function logTransportSystem (...args: any) {

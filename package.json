@@ -53,6 +53,7 @@
     "access": "public"
   },
   "_moduleAliases": {
-    "@": "build"
+    "@": "build",
+    "plugins": "plugins"
   }
 }
