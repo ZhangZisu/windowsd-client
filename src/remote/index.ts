@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import uuid from 'uuid/v4'
 
 import { RPCHost, Invoker } from '@/shared/rpcbase'
-import { cliArgs } from '@/cli'
+import { cliArgs } from '@/shared/cli'
 import { logRemoteIO } from '@/shared/logger'
 import { bus } from '@/shared/bus'
 

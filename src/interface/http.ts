@@ -1,7 +1,7 @@
 import { createServer } from 'http'
 
 import { app } from '@/interface/express'
-import { cliArgs } from '@/cli'
+import { cliArgs } from '@/shared/cli'
 import { logInterfaceHTTP } from '@/shared/logger'
 
 export const server = createServer(app)

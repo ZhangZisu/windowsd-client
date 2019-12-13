@@ -4,7 +4,7 @@ import { extensions } from 'webdav-server/lib/index.v2'
 import { json } from 'body-parser'
 
 import { packageJson } from '@/shared/package'
-import { cliArgs } from '@/cli'
+import { cliArgs } from '@/shared/cli'
 import { endpoints } from '@/interface/cm'
 import { DAVServer } from '@/interface/dav'
 import { invoke } from '@/router'

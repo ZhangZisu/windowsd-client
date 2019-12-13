@@ -1,5 +1,5 @@
 import { RPCHost, Invoker } from '@/shared/rpcbase'
-import { getCliArgs, getProcessInfo, getSystemInfo, endpoints } from './misc'
+import { _getCliArgs, _getProcessInfo, _getSystemInfo, _endpoints, _updateDNS, _resolveDNS } from './misc'
 
 export class BuiltinHost extends RPCHost {
   private fns: Map<string, (args: any, cfg: any) => any>
@@ -8,10 +8,12 @@ export class BuiltinHost extends RPCHost {
     super(invoker)
     this.fns = new Map()
 
-    this.register('cli_args', getCliArgs)
-    this.register('process', getProcessInfo)
-    this.register('system', getSystemInfo)
-    this.register('endpoints', endpoints)
+    this.register('cli_args', _getCliArgs)
+    this.register('process', _getProcessInfo)
+    this.register('system', _getSystemInfo)
+    this.register('endpoints', _endpoints)
+    this.register('dns_upd', _updateDNS)
+    this.register('dns_res', _resolveDNS)
     this.register('list_builtins', () => [...this.fns.keys()])
   }
 

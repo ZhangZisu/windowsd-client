@@ -23,3 +23,7 @@ export function logInterfaceHTTP (...args: any) {
 export function logInterfaceCM (...args: any) {
   console.log(chalk.bgYellow.black('Interface'), chalk.blue('CM'), ...args)
 }
+
+export function logDNS (...args: any) {
+  console.log(chalk.blue('DNS'), ...args)
+}

@@ -16,7 +16,15 @@ global.invoke = deasync(invokeAsync)
 /* global il */
 global.il = (method, args) => invoke(method, args || {}, { local: true })
 /* global ir */
-global.ir = (method, args, target) => invoke(method, args || {}, { target })
+global.ir = (method, args, target) => {
+  if (target) {
+    target = il('dns_res', { name: target })
+    if (!target) throw new Error('DNS Failed')
+    return invoke(method, args || {}, { target })
+  } else {
+    return invoke(method, args || {}, {})
+  }
+}
 
 const main = async () => {
   console.log(il('cli_args', {}))

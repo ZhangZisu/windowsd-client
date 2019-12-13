@@ -1,6 +1,6 @@
 import { RemoteHost } from '@/remote'
 import { LocalHost } from '@/local'
-import { cliArgs } from '@/cli'
+import { cliArgs } from '@/shared/cli'
 
 export const remoteHost = new RemoteHost(<any>invoke)
 export const localHost = new LocalHost(<any>invoke)
