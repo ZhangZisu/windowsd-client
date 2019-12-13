@@ -8,12 +8,12 @@ export class BuiltinHost extends RPCHost {
     super(invoker)
     this.fns = new Map()
 
-    this.register('cli_args', _getCliArgs)
-    this.register('process', _getProcessInfo)
-    this.register('system', _getSystemInfo)
-    this.register('endpoints', _endpoints)
-    this.register('dns_upd', _updateDNS)
-    this.register('dns_res', _resolveDNS)
+    this.register('cli_args', _getCliArgs.bind(this))
+    this.register('process', _getProcessInfo.bind(this))
+    this.register('system', _getSystemInfo.bind(this))
+    this.register('endpoints', _endpoints.bind(this))
+    this.register('dns_upd', _updateDNS.bind(this))
+    this.register('dns_res', _resolveDNS.bind(this))
     this.register('list_builtins', () => [...this.fns.keys()])
   }
 
@@ -25,6 +25,6 @@ export class BuiltinHost extends RPCHost {
 
   register (name: string, fn: (args: any, cfg: any) => any) {
     if (this.fns.has(name)) throw new Error('Duplicate registeration')
-    this.fns.set(name, fn.bind(this))
+    this.fns.set(name, fn)
   }
 }

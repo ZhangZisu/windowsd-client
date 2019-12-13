@@ -20,6 +20,25 @@ export class LocalHost extends RPCHost {
     this.loadedPlugins = new Map()
     this.maintance = true
     this.activeBackup = new Set()
+
+    this.builtin.register('enable_maintance', this.enableMaintance.bind(this))
+    this.builtin.register('disable_maintance', async (args) => {
+      const { loadAll } = args
+      if (typeof loadAll !== 'boolean') throw new Error('Bad Arg: loadAll')
+      return this.disableMaintance(loadAll)
+    })
+    this.builtin.register('is_maintance', this.isMaintance.bind(this))
+    this.builtin.register('list_plugins', this.listPlugins.bind(this))
+    this.builtin.register('active_plugin', async (args) => {
+      const { id } = args
+      if (typeof id !== 'string') throw new Error('Bad Arg: id')
+      return this.activePlugin(id)
+    })
+    this.builtin.register('deactive_plugin', async (args) => {
+      const { id } = args
+      if (typeof id !== 'string') throw new Error('Bad Arg: id')
+      return this.deactivePlugin(id)
+    })
   }
 
   invoke (method:string, args:any, cfg:any) {

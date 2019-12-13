@@ -21,7 +21,7 @@ export class RemoteHost extends RPCHost {
 
     this.conn.on('error', (e: any) => {
       logRemoteIO(chalk.red('Error'))
-      console.error(e)
+      logRemoteIO(e)
       process.exit(1)
     })
 
@@ -31,7 +31,7 @@ export class RemoteHost extends RPCHost {
 
     this.conn.on('rpc', this.handle.bind(this))
 
-    this.conn.on('system', (...msg:any) => bus.emit('system', ...msg))
+    this.conn.on('system', (...msg: any) => bus.emit('system', ...msg))
   }
 
   invoke (method: string, args: any, cfg: any) {
@@ -51,7 +51,7 @@ export class RemoteHost extends RPCHost {
       if (msg.length === 4) {
         // Request
         const [asyncID, method, args, cfg] = msg
-        return this.handleRequest(asyncID, method, args, cfg)
+        return this.handleRequest(asyncID, method, args, { local: true, ...cfg })
       } else if (msg.length === 3) {
         // Response
         const [asyncID, result, errstr] = msg
@@ -71,7 +71,7 @@ export class RemoteHost extends RPCHost {
   private handleResponse (asyncID: string, result: any, errstr: any) {
     const cb = this.cbs.get(asyncID)
     if (!cb) {
-      console.log(`Missed response: ${asyncID}`)
+      logRemoteIO(`Missed response: ${asyncID}`)
       return
     }
     if (typeof errstr === 'string') return cb(createError(errstr), result)

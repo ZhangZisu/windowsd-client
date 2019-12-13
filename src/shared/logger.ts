@@ -1,29 +1,16 @@
 import chalk from 'chalk'
 
-export function logRemoteIO (...args: any) {
-  console.log(chalk.bgRed.black('Remote'), chalk.green('IO'), ...args)
-}
+const createLogger = (...prefix: any) =>
+  (...args: any) => console.log(...prefix, ...args)
 
-export function logPluginHost (...args: any) {
-  console.log(chalk.bgBlue.black('Plugin'), chalk.red('Host'), ...args)
-}
+export const logRemoteIO = createLogger(chalk.bgRed.black('Remote'), chalk.green('IO'))
+export const logPluginHost = createLogger(chalk.bgBlue.black('Plugin'), chalk.red('Host'))
+export const logMisc = createLogger(chalk.bgGray('Misc'))
+export const logInterfaceHTTP = createLogger(chalk.bgYellow.black('Interface'), chalk.green('HTTP'))
+export const logInterfaceCM = createLogger(chalk.bgYellow.black('Interface'), chalk.blue('CM'))
+export const logDNS = createLogger(chalk.blue('DNS'))
+export const logStartup = createLogger(chalk.green('Startup'))
 
 export function logPluginInstance (id: string, ...args: any) {
   console.log(chalk.bgBlue.black('Plugin'), chalk.blue(id), ...args)
-}
-
-export function logMisc (...args: any) {
-  console.log(chalk.bgGray('Misc'), ...args)
-}
-
-export function logInterfaceHTTP (...args: any) {
-  console.log(chalk.bgYellow.black('Interface'), chalk.green('HTTP'), ...args)
-}
-
-export function logInterfaceCM (...args: any) {
-  console.log(chalk.bgYellow.black('Interface'), chalk.blue('CM'), ...args)
-}
-
-export function logDNS (...args: any) {
-  console.log(chalk.blue('DNS'), ...args)
 }
