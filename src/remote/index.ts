@@ -6,6 +6,7 @@ import { RPCHost, Invoker } from '@/shared/rpcbase'
 import { cliArgs } from '@/shared/cli'
 import { logRemoteIO } from '@/shared/logger'
 import { bus } from '@/shared/bus'
+import { createError } from '@/shared/error'
 
 export class RemoteHost extends RPCHost {
   private conn: SocketIOClient.Socket
@@ -73,7 +74,7 @@ export class RemoteHost extends RPCHost {
       console.log(`Missed response: ${asyncID}`)
       return
     }
-    if (typeof errstr === 'string') return cb(new Error(errstr), result)
+    if (typeof errstr === 'string') return cb(createError(errstr), result)
     return cb(undefined, result)
   }
 

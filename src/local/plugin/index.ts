@@ -3,6 +3,7 @@ import { load } from '@/shared/plugin'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { logPluginInstance } from '@/shared/logger'
+import { createError } from '@/shared/error'
 
 export class Plugin extends RPCHost {
   public id: string
@@ -86,7 +87,7 @@ export class Plugin extends RPCHost {
       logPluginInstance(this.id, `Missed response: ${asyncID}`)
       return
     }
-    if (typeof errstr === 'string') return cb(new Error(errstr), result)
+    if (typeof errstr === 'string') return cb(createError(errstr), result)
     return cb(undefined, result)
   }
 }

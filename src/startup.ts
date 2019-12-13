@@ -2,7 +2,7 @@ import chalk from 'chalk'
 
 import { updateDeviceLazy } from '@/interface/cm'
 import { cliArgs } from '@/shared/cli'
-import { invoke, localHost } from '@/router'
+import { invoke, localHost, startupDone } from '@/router'
 import { updateDNS } from './interface/dns'
 
 const logPrefix = chalk.green('Startup')
@@ -28,6 +28,8 @@ async function startup () {
     if (typeof id !== 'string') throw new Error('Bad Arg: id')
     return localHost.deactivePlugin(id)
   })
+
+  startupDone()
 
   try {
     const devices = <{ id: string, allowRPC: boolean }[]> await invoke('list_devices', {}, {})
