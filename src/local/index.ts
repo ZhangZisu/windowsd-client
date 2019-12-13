@@ -39,6 +39,8 @@ export class LocalHost extends RPCHost {
       if (typeof id !== 'string') throw new Error('Bad Arg: id')
       return this.deactivePlugin(id)
     })
+    this.builtin.register('install_plugin', this.installPlugins.bind(this))
+    this.builtin.register('uninstall_plugin', this.uninstallPlugins.bind(this))
   }
 
   invoke (method:string, args:any, cfg:any) {

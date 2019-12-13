@@ -4,9 +4,7 @@ import { cliArgs } from '@/shared/cli'
 import { setDNS, resolveDNS } from '@/shared/dns'
 
 export function _getCliArgs () {
-  return {
-    device: cliArgs.device
-  }
+  return cliArgs
 }
 
 export function _getProcessInfo () {

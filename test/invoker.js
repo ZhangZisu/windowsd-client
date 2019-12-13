@@ -8,7 +8,7 @@ const url = `http://127.0.0.1:5000/${argv.device}/rpc`
 function invokeAsync(method, args, cfg, cb) {
   request.post(url, { body: { method, args, cfg }, json: true })
     .then(result => cb(undefined, result))
-    .catch(err => cb(err))
+    .catch(err => cb(err.response.body))
 }
 
 /* global invoke */

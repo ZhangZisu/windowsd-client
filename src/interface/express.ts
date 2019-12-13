@@ -32,7 +32,7 @@ app.post(`/${cliArgs.device}/rpc`, (req, res) => {
   if (typeof cfg !== 'object') return <unknown>res.status(400).send('cfg')
   invoke(method, args, cfg)
     .then((result) => res.json(result))
-    .catch((err) => res.status(500).json(err))
+    .catch((err) => res.status(500).json(err.message))
 })
 
 app.post(`/${cliArgs.device}/sh`, (_req, res) => {

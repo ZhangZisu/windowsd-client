@@ -1,7 +1,7 @@
 import { get } from 'request-promise-native'
 
 import { logInterfaceCM } from '@/shared/logger'
-import { invoke } from '@/router'
+import { invoke, localHost } from '@/router'
 import { bus } from '@/shared/bus'
 
 export const endpoints: Map<string, string> = new Map()
@@ -9,9 +9,13 @@ export const lazyTimeouts: Map<string, NodeJS.Timeout> = new Map()
 
 const lazyDelay = 500 // 0.5s
 
-export function updateDeviceLazy (id: string) {
+function cancelDeviceUpdate (id: string) {
   const timeout = lazyTimeouts.get(id)
   timeout && clearTimeout(timeout)
+}
+
+export function updateDeviceLazy (id: string) {
+  cancelDeviceUpdate(id)
   lazyTimeouts.set(id, setTimeout(updateDevice, lazyDelay, id))
 }
 
@@ -44,5 +48,23 @@ bus.on('system', (msg) => {
   if (msg.event === 'online' || msg.event === 'offline') {
     const deviceID = <string>msg.deviceID
     updateDeviceLazy(deviceID)
+  }
+})
+
+localHost.builtin.register('update_ep', async function (args) {
+  const { device, alter } = args
+  if (typeof device !== 'string') throw new Error('Bad Arg: device')
+  if (alter && typeof alter !== 'string') throw new Error('Bad Arg: alter')
+  if (alter) {
+    cancelDeviceUpdate(device)
+    if (await testConn(alter, device)) {
+      endpoints.set(device, alter)
+      logInterfaceCM(device, '->', alter)
+      return true
+    }
+    return false
+  } else {
+    updateDeviceLazy(device)
+    return true
   }
 })
