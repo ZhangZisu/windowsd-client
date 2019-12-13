@@ -9,7 +9,7 @@ import { bus } from '@/shared/bus'
 
 export class RemoteHost extends RPCHost {
   private conn: SocketIOClient.Socket
-  private cbs: Map<string, (result: any, error?: Error) => void> = new Map()
+  private cbs: Map<string, (error?: Error, result?: any) => void> = new Map()
 
   constructor (invoker: Invoker) {
     super(invoker)
@@ -36,7 +36,7 @@ export class RemoteHost extends RPCHost {
   invoke (method: string, args: any, cfg: any) {
     return new Promise((resolve, reject) => {
       const asyncID = uuid()
-      this.cbs.set(asyncID, (result, error) => {
+      this.cbs.set(asyncID, (error, result) => {
         this.cbs.delete(asyncID)
         if (error) return reject(error)
         return resolve(result)
@@ -73,8 +73,8 @@ export class RemoteHost extends RPCHost {
       console.log(`Missed response: ${asyncID}`)
       return
     }
-    if (typeof errstr === 'string') return cb(result, new Error(errstr))
-    return cb(result)
+    if (typeof errstr === 'string') return cb(new Error(errstr), result)
+    return cb(undefined, result)
   }
 
   private send (msg: any) {

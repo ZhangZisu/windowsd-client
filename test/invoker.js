@@ -1,52 +1,22 @@
 const repl = require('repl')
-const io = require('socket.io-client')
-const uuid = require('uuid/v4')
 const argv = require('yargs').argv
 const deasync = require('deasync')
+const request = require('request-promise-native')
 
-const conn = io('http://localhost:5000', {
-  extraHeaders: {
-    'user-agent': 'User-Agent: Test/0'
-  },
-  query: {
-    deviceID: argv.device
-  }
-})
+const url = `http://127.0.0.1:5000/${argv.device}/rpc`
 
-conn.on('connect', () => {
-  console.log('Connected')
-})
-
-conn.on('error', (err) => {
-  console.error(err)
-  process.exit(1)
-})
-
-const cbs = new Map()
-
-function invokeAsync (method, args, cfg, cb) {
-  const asyncID = uuid()
-  cbs.set(asyncID, (result, error) => {
-    cbs.delete(asyncID)
-    cb(error, result)
-  })
-  conn.emit('rpc', [asyncID, method, args, cfg])
+function invokeAsync(method, args, cfg, cb) {
+  request.post(url, { body: { method, args, cfg }, json: true })
+    .then(result => cb(undefined, result))
+    .catch(err => cb(err))
 }
 
 /* global invoke */
 global.invoke = deasync(invokeAsync)
 /* global il */
-global.il = (method, args) => invoke(method, args, { local: true })
+global.il = (method, args) => invoke(method, args || {}, { local: true })
 /* global ir */
-global.ir = (method, args, target) => invoke(method, args, { target })
-
-conn.on('rpc', (msg) => {
-  const [asyncID, result, errstr] = msg
-  const cb = cbs.get(asyncID)
-  if (!cb) return
-  if (errstr) return cb(result, new Error(errstr))
-  return cb(result, null)
-})
+global.ir = (method, args, target) => invoke(method, args || {}, { target })
 
 const main = async () => {
   console.log(il('cli_args', {}))
@@ -64,4 +34,6 @@ const main = async () => {
   })
 }
 
-main()
+main().catch(err => {
+  console.log(err.message)
+})

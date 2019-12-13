@@ -12,6 +12,7 @@ export class BuiltinHost extends RPCHost {
     this.register('process', getProcessInfo)
     this.register('system', getSystemInfo)
     this.register('endpoints', endpoints)
+    this.register('list_builtins', () => [...this.fns.keys()])
   }
 
   async invoke (method: string, args: any, cfg: any) {

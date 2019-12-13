@@ -8,7 +8,7 @@ export class Plugin extends RPCHost {
   public id: string
   private mainPath: string
   private worker?: Worker
-  private cbs: Map<string, (result: any, error?: Error) => void>
+  private cbs: Map<string, (error?: Error, result?: any) => void>
   private activePlugins: Map<string, Plugin>
   private loadedPlugins: Map<string, Plugin>
 
@@ -31,9 +31,9 @@ export class Plugin extends RPCHost {
     logPluginInstance(this.id, 'Actived')
   }
 
-  deactive () {
+  async deactive () {
     if (!this.worker) throw new Error('Plugin is not actived')
-    this.worker.terminate()
+    await this.worker.terminate()
     this.worker = undefined
     this.activePlugins.delete(this.id)
     logPluginInstance(this.id, 'Deactived')
@@ -43,7 +43,7 @@ export class Plugin extends RPCHost {
     return new Promise((resolve, reject) => {
       if (!this.worker) return reject(new Error('Not actived'))
       const asyncID = uuid()
-      this.cbs.set(asyncID, (result, error) => {
+      this.cbs.set(asyncID, (error, result) => {
         this.cbs.delete(asyncID)
         if (error) return reject(error)
         return resolve(result)
@@ -86,7 +86,7 @@ export class Plugin extends RPCHost {
       logPluginInstance(this.id, `Missed response: ${asyncID}`)
       return
     }
-    if (typeof errstr === 'string') return cb(result, new Error(errstr))
-    return cb(result)
+    if (typeof errstr === 'string') return cb(new Error(errstr), result)
+    return cb(undefined, result)
   }
 }

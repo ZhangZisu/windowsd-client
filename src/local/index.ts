@@ -20,7 +20,6 @@ export class LocalHost extends RPCHost {
     this.loadedPlugins = new Map()
     this.maintance = true
     this.activeBackup = new Set()
-    this.disableMaintance(true)
   }
 
   invoke (method:string, args:any, cfg:any) {
@@ -69,6 +68,10 @@ export class LocalHost extends RPCHost {
 
   async isMaintance () {
     return this.maintance
+  }
+
+  listPlugins () {
+    return [...this.loadedPlugins.keys()]
   }
 
   activePlugin (id: string) {
