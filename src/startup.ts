@@ -4,7 +4,7 @@ import { updateDeviceLazy } from '@/interface/cm'
 import { cliArgs } from '@/shared/cli'
 import { invoke, localHost, startupDone } from '@/router'
 import { updateDNS } from './interface/dns'
-import { logStartup } from './shared/logger'
+import { logStartup, beautifyUUID } from './shared/logger'
 
 async function startup () {
   await localHost.disableMaintance(true)
@@ -20,7 +20,7 @@ async function startup () {
         updateDeviceLazy(id)
         await updateDNS(id)
       } catch (e) {
-        logStartup(id, chalk.red('DO NOT support DNS'))
+        logStartup(beautifyUUID(id), chalk.red('DO NOT support DNS'))
       }
     }
   } catch (e) {

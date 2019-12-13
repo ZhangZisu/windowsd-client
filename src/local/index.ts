@@ -28,7 +28,8 @@ export class LocalHost extends RPCHost {
       return this.disableMaintance(loadAll)
     })
     this.builtin.register('is_maintance', this.isMaintance.bind(this))
-    this.builtin.register('list_plugins', this.listPlugins.bind(this))
+    this.builtin.register('list_loaded', this.listLoadedPlugins.bind(this))
+    this.builtin.register('list_active', this.listActivePlugins.bind(this))
     this.builtin.register('active_plugin', async (args) => {
       const { id } = args
       if (typeof id !== 'string') throw new Error('Bad Arg: id')
@@ -91,8 +92,12 @@ export class LocalHost extends RPCHost {
     return this.maintance
   }
 
-  listPlugins () {
+  listLoadedPlugins () {
     return [...this.loadedPlugins.keys()]
+  }
+
+  listActivePlugins () {
+    return [...this.activePlugins.keys()]
   }
 
   activePlugin (id: string) {
