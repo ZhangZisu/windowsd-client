@@ -10,7 +10,7 @@ if (!fs.existsSync(clientDir)) fs.mkdirSync(clientDir)
 const pluginDir = path.join(clientDir, 'plugins')
 if (!fs.existsSync(pluginDir)) {
   fs.mkdirSync(pluginDir)
-  fs.copyFileSync(path.join(__dirname, '..', 'plugins', 'package-example.json'), path.join(pluginDir, 'package.json'))
+  fs.copyFileSync(path.join(__dirname, '..', 'plugin-package.json'), path.join(pluginDir, 'package.json'))
   console.log('Create plugin dir', pluginDir)
 } else {
   console.log('Plugin dir found', pluginDir)

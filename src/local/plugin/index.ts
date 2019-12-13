@@ -1,5 +1,5 @@
 import { RPCHost, Invoker } from '@/shared/rpcbase'
-import { load } from 'plugins'
+import { load } from '@/shared/plugin'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
 import { logPluginInstance } from '@/shared/logger'

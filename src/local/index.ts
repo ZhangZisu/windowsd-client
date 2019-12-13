@@ -1,4 +1,4 @@
-import { dependencies, pluginDir } from 'plugins'
+import { dependencies, pluginDir } from '@/shared/plugin'
 import { RPCHost, Invoker } from '@/shared/rpcbase'
 import { logPluginHost } from '@/shared/logger'
 import { additionalNPMArgs, execAsync, outPrefix, errPrefix } from '@/shared/misc'
@@ -40,7 +40,7 @@ export class LocalHost extends RPCHost {
     this.maintance = true
     for (const [v, k] of this.activePlugins) {
       this.activeBackup.add(v)
-      k.deactive()
+      await k.deactive()
     }
     this.activePlugins.clear()
     this.loadedPlugins.clear()
@@ -80,10 +80,10 @@ export class LocalHost extends RPCHost {
     plugin.active()
   }
 
-  deactivePlugin (id: string) {
+  async deactivePlugin (id: string) {
     const plugin = this.loadedPlugins.get(id)
     if (!plugin) throw new Error('Target is not loaded')
-    plugin.deactive()
+    await plugin.deactive()
   }
 
   async installPlugins (args: any) {
