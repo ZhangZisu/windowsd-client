@@ -1,6 +1,6 @@
 import { get } from 'request-promise-native'
 
-import { logInterfaceCM } from '@/shared/logger'
+import { logInterfaceCM, beautifyUUID } from '@/shared/logger'
 import { invoke, localHost } from '@/router'
 import { bus } from '@/shared/bus'
 
@@ -20,13 +20,13 @@ export function updateDeviceLazy (id: string) {
 }
 
 export async function updateDevice (id: string) {
-  logInterfaceCM('update', id)
+  logInterfaceCM('update', beautifyUUID(id))
   try {
     const eps = <string[]> await invoke('endpoints', {}, { target: id })
     for (const ep of eps) {
       if (await testConn(ep, id)) {
         endpoints.set(id, ep)
-        logInterfaceCM(id, '->', ep)
+        logInterfaceCM(beautifyUUID(id), '->', ep)
         return
       }
     }
@@ -59,7 +59,7 @@ localHost.builtin.register('update_ep', async function (args) {
     cancelDeviceUpdate(device)
     if (await testConn(alter, device)) {
       endpoints.set(device, alter)
-      logInterfaceCM(device, '->', alter)
+      logInterfaceCM(beautifyUUID(device), '->', alter)
       return true
     }
     return false

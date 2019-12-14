@@ -1,5 +1,10 @@
 import chalk from 'chalk'
 
+const uuidColors = [chalk.bgGreen.black, chalk.bgBlue.black, chalk.bgYellow.black, chalk.bgRed.black, chalk.bgWhite.black]
+
+export const beautifyUUID = (s: string) =>
+  chalk.underline(s.split('-').map((v, i) => uuidColors[i](v.toUpperCase())).join('-'))
+
 const createLogger = (...prefix: any) =>
   (...args: any) => console.log(...prefix, ...args)
 
