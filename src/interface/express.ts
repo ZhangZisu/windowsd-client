@@ -56,13 +56,15 @@ app.post(`/${cliArgs.device}/proxy`, (req, res) => {
   const port = parseInt(req.query.port, 10)
   if (typeof host !== 'string') return <unknown>res.status(400).send('Host must be string')
   if (isNaN(port)) return <unknown>res.status(400).send('Port must be number')
+  let connected = false
   const conn = createConnection({ port, host, timeout: 1000 }, () => {
+    connected = true
     res.status(200)
     req.pipe(conn)
     conn.pipe(res)
   })
   conn.on('error', (err) => {
-    res.status(500).send(err.message)
+    connected || res.status(500).send(err.message)
   })
 })
 
@@ -71,5 +73,7 @@ app.use('/:id/:method', (req, res) => {
   const ep = endpoints.get(req.params.id)!
   proxy.web(req, res, {
     target: `http://${ep}/${req.params.id}/${req.params.method}`
+  }, (err) => {
+    res.status(500).send(err.message)
   })
 })
