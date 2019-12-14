@@ -9,6 +9,7 @@ net.createServer((socket) => {
   socket.pipe(conn)
   conn.on('response', (res) => {
     if (res.statusCode === 200) {
+      console.log('Proxy succeed')
       res.pipe(socket)
     } else {
       console.log('Proxy failed')

@@ -56,12 +56,12 @@ app.post(`/${cliArgs.device}/proxy`, (req, res) => {
   const port = parseInt(req.query.port, 10)
   if (typeof host !== 'string') return <unknown>res.status(400).send('Host must be string')
   if (isNaN(port)) return <unknown>res.status(400).send('Port must be number')
-  const conn = createConnection({ port, host, timeout: 1000 })
-  req.pipe(conn)
-  conn.pipe(res)
+  const conn = createConnection({ port, host, timeout: 1000 }, () => {
+    res.status(200)
+    req.pipe(conn)
+    conn.pipe(res)
+  })
   conn.on('error', (err) => {
-    req.unpipe(conn)
-    conn.unpipe(res)
     res.status(500).send(err.message)
   })
 })
