@@ -1,6 +1,4 @@
 # Windowds Client
+> A complete solution for remote control and desktop automation
 
-Notice: the `package.json` in plugins should be always ignored
-```sh
-git update-index --skip-worktree ./plugins/package.json
-```
+***Current status: Active development***
