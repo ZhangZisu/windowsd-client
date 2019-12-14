@@ -8,6 +8,7 @@ export const logPluginHost = createLogger(chalk.bgBlue.black('Plugin'), chalk.re
 export const logMisc = createLogger(chalk.bgGray('Misc'))
 export const logInterfaceHTTP = createLogger(chalk.bgYellow.black('Interface'), chalk.green('HTTP'))
 export const logInterfaceCM = createLogger(chalk.bgYellow.black('Interface'), chalk.blue('CM'))
+export const logInterfaceExpress = createLogger(chalk.bgYellow.black('Interface'), chalk.cyan('Express'))
 export const logDNS = createLogger(chalk.blue('DNS'))
 export const logStartup = createLogger(chalk.green('Startup'))
 

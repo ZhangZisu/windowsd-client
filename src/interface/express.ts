@@ -2,12 +2,15 @@ import express from 'express'
 import { createProxyServer } from 'http-proxy'
 import { extensions } from 'webdav-server/lib/index.v2'
 import { json } from 'body-parser'
+import { spawn } from 'node-pty'
 
 import { packageJson } from '@/shared/package'
 import { cliArgs } from '@/shared/cli'
 import { endpoints } from '@/interface/cm'
 import { DAVServer } from '@/interface/dav'
 import { invoke } from '@/router'
+import { logInterfaceExpress } from '@/shared/logger'
+import { createConnection } from 'net'
 
 const proxy = createProxyServer()
 
@@ -35,12 +38,32 @@ app.post(`/${cliArgs.device}/rpc`, (req, res) => {
     .catch((err) => res.status(500).json(err.message))
 })
 
-app.post(`/${cliArgs.device}/sh`, (_req, res) => {
-  res.status(501).send('Not Implemented')
+app.post(`/${cliArgs.device}/sh`, (req, res) => {
+  const shell = req.query.shell || (process.platform === 'win32' ? process.env.ComSpec : '/bin/sh')
+  const cp = spawn(shell, [], { cols: 80, rows: 30 })
+  req.on('data', (chunk) => { cp.write(chunk) })
+  cp.on('data', (data) => { res.write(data) })
+  req.on('end', () => { cp.kill() })
+  res.on('end', () => { cp.kill() })
+  cp.on('exit', (code, signal) => {
+    logInterfaceExpress(code, signal)
+    res.end(`Terminal exited code: ${code} signal: ${signal}`)
+  })
 })
 
-app.post(`/${cliArgs.device}/proxy`, (_req, res) => {
-  res.status(501).send('Not Implemented')
+app.post(`/${cliArgs.device}/proxy`, (req, res) => {
+  const host = req.query.host
+  const port = parseInt(req.query.port, 10)
+  if (typeof host !== 'string') return <unknown>res.status(400).send('Host must be string')
+  if (isNaN(port)) return <unknown>res.status(400).send('Port must be number')
+  const conn = createConnection({ port, host, timeout: 1000 })
+  req.pipe(conn)
+  conn.pipe(res)
+  conn.on('error', (err) => {
+    req.unpipe(conn)
+    conn.unpipe(res)
+    res.status(500).send(err.message)
+  })
 })
 
 app.use('/:id/:method', (req, res) => {
