@@ -22,7 +22,9 @@ export class RemoteHost extends RPCHost {
     this.conn.on('error', (e: any) => {
       logRemoteIO(chalk.red('Error'))
       logRemoteIO(e)
-      process.exit(1)
+      if (e === 'Bad Device') {
+        process.exit(1)
+      }
     })
 
     this.conn.on('disconnect', () => {
