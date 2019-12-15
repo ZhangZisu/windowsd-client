@@ -12,7 +12,7 @@ export const cliArgs = yargs
     type: 'string'
   })
   .option('server', {
-    default: 'http://api.zhangzisu.cn:8080',
+    default: 'https://windowsd.herokuapp.com/',
     demandOption: true,
     type: 'string'
   })
