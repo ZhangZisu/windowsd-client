@@ -2,15 +2,14 @@ import express from 'express'
 import { createProxyServer } from 'http-proxy'
 import { extensions } from 'webdav-server/lib/index.v2'
 import { json } from 'body-parser'
-import { spawn } from 'node-pty-prebuilt-multiarch'
+import { createConnection } from 'net'
 
 import { packageJson } from '@/shared/package'
 import { cliArgs } from '@/shared/cli'
 import { endpoints } from '@/interface/cm'
 import { DAVServer } from '@/interface/dav'
 import { invoke } from '@/router'
-import { logInterfaceExpress } from '@/shared/logger'
-import { createConnection } from 'net'
+import { resolveDNS } from '@/shared/dns'
 
 const proxy = createProxyServer()
 
@@ -38,19 +37,6 @@ app.post(`/${cliArgs.device}/rpc`, (req, res) => {
     .catch((err) => res.status(500).json(err.message))
 })
 
-app.post(`/${cliArgs.device}/sh`, (req, res) => {
-  const shell = req.query.shell || (process.platform === 'win32' ? process.env.ComSpec : '/bin/sh')
-  const cp = spawn(shell, [], { cols: 80, rows: 30 })
-  req.on('data', (chunk) => { cp.write(chunk) })
-  cp.on('data', (data) => { res.write(data) })
-  req.on('end', () => { cp.kill() })
-  res.on('end', () => { cp.kill() })
-  cp.on('exit', (code, signal) => {
-    logInterfaceExpress(code, signal)
-    res.end(`Terminal exited code: ${code} signal: ${signal}`)
-  })
-})
-
 app.post(`/${cliArgs.device}/proxy`, (req, res) => {
   const host = req.query.host
   const port = parseInt(req.query.port, 10)
@@ -66,6 +52,13 @@ app.post(`/${cliArgs.device}/proxy`, (req, res) => {
   conn.on('error', (err) => {
     connected || res.status(500).send(err.message)
   })
+})
+
+app.get('/direct/:host', (req, res) => {
+  const id = <string>resolveDNS(req.params.host)
+  if (!endpoints.has(id)) return <unknown>res.status(400).send('Bad request')
+  const ep = endpoints.get(id)!
+  res.redirect(`http://${ep}/${id}`)
 })
 
 app.use('/:id/:method', (req, res) => {
