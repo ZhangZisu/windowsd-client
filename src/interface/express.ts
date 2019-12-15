@@ -2,7 +2,7 @@ import express from 'express'
 import { createProxyServer } from 'http-proxy'
 import { extensions } from 'webdav-server/lib/index.v2'
 import { json } from 'body-parser'
-import { spawn } from 'node-pty'
+import { spawn } from 'node-pty-prebuilt-multiarch'
 
 import { packageJson } from '@/shared/package'
 import { cliArgs } from '@/shared/cli'
