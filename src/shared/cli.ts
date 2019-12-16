@@ -20,4 +20,8 @@ export const cliArgs = yargs
     default: hostname(),
     type: 'string'
   })
+  .option('pluginExtra', {
+    default: [],
+    type: 'array'
+  })
   .argv

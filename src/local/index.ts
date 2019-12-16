@@ -1,4 +1,4 @@
-import { dependencies, pluginDir } from '@/shared/plugin'
+import { pluginList, pluginDir } from '@/shared/plugin'
 import { RPCHost, Invoker } from '@/shared/rpcbase'
 import { logPluginHost } from '@/shared/logger'
 import { additionalNPMArgs, execAsync, outPrefix, errPrefix } from '@/shared/misc'
@@ -76,7 +76,7 @@ export class LocalHost extends RPCHost {
     const { stderr, stdout } = await execAsync(cmd, { cwd: pluginDir })
     stdout.split('\n').filter(v => v.length).forEach(v => logPluginHost('f', outPrefix, v))
     stderr.split('\n').filter(v => v.length).forEach(v => logPluginHost('f', errPrefix, v))
-    const dep = dependencies()
+    const dep = pluginList()
     for (const id in dep) {
       logPluginHost(`+${id}@${dep[id]}`)
       const plugin = new Plugin(id, this.activePlugins, this.loadedPlugins, this.invoker)
