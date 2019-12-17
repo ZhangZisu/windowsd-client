@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { homedir } from 'os'
-import { readFileSync, existsSync } from 'fs'
-import { cliArgs } from './cli'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 
 export const pluginDir = join(homedir(), '.windowsd', 'client', 'plugins')
 const nodeModules = join(pluginDir, 'node_modules')
@@ -13,8 +12,11 @@ interface IPluginList {
 
 export const pluginList = (): IPluginList => {
   const pkg = JSON.parse(readFileSync(join(pluginDir, 'package.json')).toString()).dependencies
-  for (const extra of cliArgs.pluginExtra) {
-    pkg[extra] = 'EXTRA'
+  if (existsSync(extraDir)) {
+    const extras = readdirSync(extraDir)
+    for (const extra of extras) {
+      pkg[extra] = 'EXTRA'
+    }
   }
   return pkg
 }
