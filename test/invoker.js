@@ -28,11 +28,11 @@ global.invoke = deasync(invokeAsync)
 /* global il */
 global.il = (method, args) => invoke(method, args || {}, { l: true })
 /* global ir */
-global.ir = (method, args, target) => {
-  if (target) {
-    target = il('dns_res', { name: target })
-    if (!target) throw new Error('DNS Failed')
-    return invoke(method, args || {}, { target })
+global.ir = (method, args, t) => {
+  if (t) {
+    t = il('dns_res', { name: t })
+    if (!t) throw new Error('DNS Failed')
+    return invoke(method, args || {}, { t })
   } else {
     return invoke(method, args || {}, {})
   }
