@@ -56,7 +56,7 @@ export class RemoteHost extends RPCHost {
       if (msg.length === 4) {
         // Request
         const [asyncID, method, args, cfg] = msg
-        return this.handleRequest(asyncID, method, args, { local: true, ...cfg })
+        return this.handleRequest(asyncID, method, args, { l: true, ...cfg })
       } else if (msg.length === 3) {
         // Response
         const [asyncID, result, errstr] = msg
