@@ -26,15 +26,15 @@ function invokeAsync(method, args, cfg, cb) {
 /* global invoke */
 global.invoke = deasync(invokeAsync)
 /* global il */
-global.il = (method, args) => invoke(method, args || {}, { l: true })
+global.il = (method, args) => invoke(method, args || {}, { l: true, o: -1 })
 /* global ir */
 global.ir = (method, args, t) => {
   if (t) {
     t = il('dns_res', { name: t })
     if (!t) throw new Error('DNS Failed')
-    return invoke(method, args || {}, { t })
+    return invoke(method, args || {}, { t, o: -1 })
   } else {
-    return invoke(method, args || {}, {})
+    return invoke(method, args || {}, { o: -1 })
   }
 }
 
