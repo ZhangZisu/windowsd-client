@@ -1,4 +1,4 @@
-import { RPCHost, Invoker } from '@/shared/rpcbase'
+import { RPCHost, Invoker, IRPCConfig } from '@/shared/rpcbase'
 import { load } from '@/shared/plugin'
 import { Worker } from 'worker_threads'
 import uuid from 'uuid/v4'
@@ -40,7 +40,7 @@ export class Plugin extends RPCHost {
     logPluginInstance(this.id, 'Deactived')
   }
 
-  invoke (method: string, args: any, cfg: any) {
+  invoke (method: string, args: any, cfg: IRPCConfig) {
     return new Promise((resolve, reject) => {
       if (!this.worker) return reject(new Error('Not actived'))
       const asyncID = uuid()
@@ -65,7 +65,7 @@ export class Plugin extends RPCHost {
     logPluginInstance(this.id, ...data)
   }
 
-  private handleRPCRequest (asyncID: string, method: string, args: any, cfg: any) {
+  private handleRPCRequest (asyncID: string, method: string, args: any, cfg: IRPCConfig) {
     this.invoker(method, args, cfg).then(result => {
       this.worker && this.worker.postMessage({
         asyncID,

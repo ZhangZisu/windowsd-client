@@ -21,6 +21,13 @@ app.get('/', (_req, res) => {
   res.json(packageJson)
 })
 
+app.get('/direct/:host', (req, res) => {
+  const id = <string>resolveDNS(req.params.host)
+  if (!endpoints.has(id)) return <unknown>res.status(400).send('Bad request')
+  const ep = endpoints.get(id)!
+  res.redirect(`http://${ep}/${id}`)
+})
+
 app.get(`/${cliArgs.device}`, (_req, res) => {
   res.json(true)
 })
@@ -52,13 +59,6 @@ app.post(`/${cliArgs.device}/proxy`, (req, res) => {
   conn.on('error', (err) => {
     connected || res.status(500).send(err.message)
   })
-})
-
-app.get('/direct/:host', (req, res) => {
-  const id = <string>resolveDNS(req.params.host)
-  if (!endpoints.has(id)) return <unknown>res.status(400).send('Bad request')
-  const ep = endpoints.get(id)!
-  res.redirect(`http://${ep}/${id}`)
 })
 
 app.use('/:id/:method', (req, res) => {

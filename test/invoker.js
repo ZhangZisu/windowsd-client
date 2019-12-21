@@ -1,9 +1,21 @@
+const argv = require('yargs')
+  .option('base', {
+    default: '127.0.0.1:5000',
+    demandOption: true,
+    type: 'string'
+  })
+  .option('device', {
+    demandOption: true,
+    type: 'string'
+  })
+  .argv
+
 const repl = require('repl')
-const argv = require('yargs').argv
 const deasync = require('deasync')
 const request = require('request-promise-native')
 
-const url = `http://127.0.0.1:5000/${argv.device}/rpc`
+const url = `http://${argv.base}/${argv.device}/rpc`
+console.log(url)
 
 function invokeAsync(method, args, cfg, cb) {
   request.post(url, { body: { method, args, cfg }, json: true })
@@ -14,7 +26,7 @@ function invokeAsync(method, args, cfg, cb) {
 /* global invoke */
 global.invoke = deasync(invokeAsync)
 /* global il */
-global.il = (method, args) => invoke(method, args || {}, { local: true })
+global.il = (method, args) => invoke(method, args || {}, { l: true })
 /* global ir */
 global.ir = (method, args, target) => {
   if (target) {

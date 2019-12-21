@@ -2,7 +2,7 @@ import io from 'socket.io-client'
 import chalk from 'chalk'
 import uuid from 'uuid/v4'
 
-import { RPCHost, Invoker } from '@/shared/rpcbase'
+import { RPCHost, Invoker, IRPCConfig } from '@/shared/rpcbase'
 import { cliArgs } from '@/shared/cli'
 import { logRemoteIO } from '@/shared/logger'
 import { bus } from '@/shared/bus'
@@ -36,7 +36,7 @@ export class RemoteHost extends RPCHost {
     this.conn.on('system', (...msg: any) => bus.emit('system', ...msg))
   }
 
-  invoke (method: string, args: any, cfg: any) {
+  invoke (method: string, args: any, cfg: IRPCConfig) {
     return new Promise((resolve, reject) => {
       const asyncID = uuid()
       this.cbs.set(asyncID, (error, result) => {
@@ -62,7 +62,7 @@ export class RemoteHost extends RPCHost {
     }
   }
 
-  private handleRequest (asyncID: string, method: string, args: any, cfg: any) {
+  private handleRequest (asyncID: string, method: string, args: any, cfg: IRPCConfig) {
     this.invoker(method, args, cfg).then(result => {
       this.send([asyncID, result, null])
     }).catch(error => {

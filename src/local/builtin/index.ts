@@ -1,8 +1,8 @@
-import { RPCHost, Invoker } from '@/shared/rpcbase'
+import { RPCHost, Invoker, IRPCConfig } from '@/shared/rpcbase'
 import { _getCliArgs, _getProcessInfo, _getSystemInfo, _endpoints, _updateDNS, _resolveDNS } from './misc'
 
 export class BuiltinHost extends RPCHost {
-  private fns: Map<string, (args: any, cfg: any) => any>
+  private fns: Map<string, (args: any, cfg: IRPCConfig) => any>
 
   constructor (invoker: Invoker) {
     super(invoker)
@@ -17,13 +17,13 @@ export class BuiltinHost extends RPCHost {
     this.register('list_builtins', () => [...this.fns.keys()])
   }
 
-  async invoke (method: string, args: any, cfg: any) {
+  async invoke (method: string, args: any, cfg: IRPCConfig) {
     const fn = this.fns.get(method)
     if (!fn) throw new Error('Method not found')
     return fn(args, cfg)
   }
 
-  register (name: string, fn: (args: any, cfg: any) => any) {
+  register (name: string, fn: (args: any, cfg: IRPCConfig) => any) {
     if (this.fns.has(name)) throw new Error('Duplicate registeration')
     this.fns.set(name, fn)
   }

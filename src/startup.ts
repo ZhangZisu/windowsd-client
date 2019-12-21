@@ -24,6 +24,7 @@ async function startup () {
       }
     }
   } catch (e) {
+    console.log(e)
     logStartup('RPC disabled')
   }
 }

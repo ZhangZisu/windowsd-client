@@ -1,9 +1,10 @@
-import { pluginList, pluginDir } from '@/shared/plugin'
+import { pluginList } from '@/shared/plugin'
 import { RPCHost, Invoker } from '@/shared/rpcbase'
 import { logPluginHost } from '@/shared/logger'
-import { additionalNPMArgs, execAsync, outPrefix, errPrefix } from '@/shared/misc'
+import { additionalNPMArgs, execAsync } from '@/shared/misc'
 import { Plugin } from '@/local/plugin'
 import { BuiltinHost } from '@/local/builtin'
+import { cliArgs } from '@/shared/cli'
 
 export class LocalHost extends RPCHost {
   builtin: BuiltinHost
@@ -73,9 +74,7 @@ export class LocalHost extends RPCHost {
     if (!this.maintance) throw new Error('Not in maintance mode')
     this.maintance = false
     const cmd = ['npm', 'i', ...additionalNPMArgs].join(' ')
-    const { stderr, stdout } = await execAsync(cmd, { cwd: pluginDir })
-    stdout.split('\n').filter(v => v.length).forEach(v => logPluginHost('f', outPrefix, v))
-    stderr.split('\n').filter(v => v.length).forEach(v => logPluginHost('f', errPrefix, v))
+    await execAsync(cmd, { cwd: cliArgs.pluginDir })
     const dep = pluginList()
     for (const id in dep) {
       logPluginHost(`+${id}@${dep[id]}`)
@@ -117,10 +116,8 @@ export class LocalHost extends RPCHost {
     if (!(plugins instanceof Array)) throw new Error('Bad Arg: plugins')
     await this.enableMaintance()
     const cmd = ['npm', 'i', '--save', ...additionalNPMArgs, ...plugins].join(' ')
-    const { stdout, stderr } = await execAsync(cmd, { cwd: pluginDir })
+    await execAsync(cmd, { cwd: cliArgs.pluginDir })
     await this.disableMaintance(false)
-    stdout.split('\n').filter(v => v.length).forEach(v => logPluginHost('i', outPrefix, v))
-    stderr.split('\n').filter(v => v.length).forEach(v => logPluginHost('i', errPrefix, v))
   }
 
   async uninstallPlugins (args: any) {
@@ -128,9 +125,7 @@ export class LocalHost extends RPCHost {
     if (!(plugins instanceof Array)) throw new Error('Bad Arg: plugins')
     await this.enableMaintance()
     const cmd = ['npm', 'r', '--save', ...additionalNPMArgs, ...plugins].join(' ')
-    const { stdout, stderr } = await execAsync(cmd, { cwd: pluginDir })
+    await execAsync(cmd, { cwd: cliArgs.pluginDir })
     await this.disableMaintance(false)
-    stdout.split('\n').filter(v => v.length).forEach(v => logPluginHost('u', outPrefix, v))
-    stderr.split('\n').filter(v => v.length).forEach(v => logPluginHost('u', errPrefix, v))
   }
 }

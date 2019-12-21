@@ -5,7 +5,7 @@ import { bus } from '@/shared/bus'
 import { logDNS } from '@/shared/logger'
 
 export async function updateDNS (id: string) {
-  const { k, v } = <any> await invoke('dns_upd', { k: cliArgs.hostname, v: cliArgs.device }, { target: id })
+  const { k, v } = <any> await invoke('dns_upd', { k: cliArgs.hostname, v: cliArgs.device }, { t: id })
   setDNS(k, v)
 }
 

@@ -12,4 +12,13 @@ export const additionalNPMArgs = process.env.IN_GFW || sync() ? ['--registry=htt
 
 logMisc('npm args', ...additionalNPMArgs)
 
-export const execAsync = promisify(exec)
+const _execAsync = promisify(exec)
+
+function execWrap (command: string, options: any) {
+  console.log('$ ' + command)
+  return _execAsync(command, options)
+}
+
+type fnExec = typeof _execAsync
+
+export const execAsync: fnExec = <any>execWrap

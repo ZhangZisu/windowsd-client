@@ -1,8 +1,15 @@
 import { join } from 'path'
-import { homedir } from 'os'
-import { readFileSync, existsSync, readdirSync } from 'fs'
+import { readFileSync, existsSync, readdirSync, mkdirSync, copyFileSync } from 'fs'
+import { cliArgs } from './cli'
 
-export const pluginDir = join(homedir(), '.windowsd', 'client', 'plugins')
+const pluginDir = cliArgs.pluginDir
+
+if (!existsSync(pluginDir)) {
+  mkdirSync(pluginDir)
+  copyFileSync(join(__dirname, '..', '..', 'plugin-package.json'), join(pluginDir, 'package.json'))
+  console.log('Create plugin dir', pluginDir)
+}
+
 const nodeModules = join(pluginDir, 'node_modules')
 const extraDir = join(pluginDir, 'extra')
 

@@ -1,5 +1,6 @@
 import yargs from 'yargs'
-import { hostname } from 'os'
+import { hostname, homedir } from 'os'
+import { join } from 'path'
 
 export const cliArgs = yargs
   .option('api', {
@@ -18,6 +19,10 @@ export const cliArgs = yargs
   })
   .option('hostname', {
     default: hostname(),
+    type: 'string'
+  })
+  .option('pluginDir', {
+    default: join(homedir(), '.windowsd', 'client', 'plugins'),
     type: 'string'
   })
   .argv

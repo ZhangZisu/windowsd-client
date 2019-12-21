@@ -22,7 +22,7 @@ export function updateDeviceLazy (id: string) {
 export async function updateDevice (id: string) {
   logInterfaceCM('update', id)
   try {
-    const eps = <string[]> await invoke('endpoints', {}, { target: id })
+    const eps = <string[]> await invoke('endpoints', {}, { t: id })
     for (const ep of eps) {
       if (await testConn(ep, id)) {
         endpoints.set(id, ep)
