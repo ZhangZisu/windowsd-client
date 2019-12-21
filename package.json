@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "http-proxy": "^1.18.0",
     "module-alias": "^2.2.2",
+    "node-machine-id": "^1.1.12",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8",
     "socket.io-client": "^2.3.0",

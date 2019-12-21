@@ -1,6 +1,7 @@
 import io from 'socket.io-client'
 import chalk from 'chalk'
 import uuid from 'uuid/v4'
+import { machineIdSync } from 'node-machine-id'
 
 import { RPCHost, Invoker, IRPCConfig } from '@/shared/rpcbase'
 import { cliArgs } from '@/shared/cli'
@@ -8,13 +9,15 @@ import { logRemoteIO } from '@/shared/logger'
 import { bus } from '@/shared/bus'
 import { createError } from '@/shared/error'
 
+const machineID = machineIdSync()
+
 export class RemoteHost extends RPCHost {
   private conn: SocketIOClient.Socket
   private cbs: Map<string, (error?: Error, result?: any) => void> = new Map()
 
   constructor (invoker: Invoker) {
     super(invoker)
-    this.conn = io(cliArgs.server, { query: { deviceID: cliArgs.device } })
+    this.conn = io(cliArgs.server, { query: { deviceID: cliArgs.device, token: machineID } })
     this.conn.on('connect', () => {
       logRemoteIO(chalk.green('Connected'))
     })
