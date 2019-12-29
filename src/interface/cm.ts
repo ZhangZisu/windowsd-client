@@ -5,49 +5,54 @@ import { invoke, localHost } from '@/router'
 import { bus } from '@/shared/bus'
 
 export const endpoints: Map<string, string> = new Map()
-export const lazyTimeouts: Map<string, NodeJS.Timeout> = new Map()
+export const lazyTimeouts: Map<string, { timeout: NodeJS.Timeout, running: boolean }> = new Map()
 
 const lazyDelay = 500 // 0.5s
 
-function cancelDeviceUpdate (id: string) {
-  const timeout = lazyTimeouts.get(id)
-  timeout && clearTimeout(timeout)
-}
-
-export function updateDeviceLazy (id: string) {
-  cancelDeviceUpdate(id)
-  lazyTimeouts.set(id, setTimeout(updateDevice, lazyDelay, id))
-}
-
-export async function updateDevice (id: string) {
-  logInterfaceCM('update', id)
-  try {
-    const eps = <string[]> await invoke('endpoints', {}, { t: id })
-    for (const ep of eps) {
-      if (await testConn(ep, id)) {
-        endpoints.set(id, ep)
-        logInterfaceCM(id, '->', ep)
-        return
+export function updateDevice (id: string, eps?: string[]) {
+  const info = lazyTimeouts.get(id)
+  if (info) {
+    if (info.running) return
+    clearTimeout(info.timeout)
+  }
+  lazyTimeouts.set(id, {
+    timeout: setTimeout(async () => {
+      lazyTimeouts.get(id)!.running = true
+      logInterfaceCM('update', id)
+      try {
+        eps = eps || <string[]> await invoke('endpoints', {}, { t: id })
+        try {
+          await Promise.all(eps.map(ep => trickyTestConn(ep, id)))
+          logInterfaceCM(id, '-?')
+        } catch (ep) {
+          endpoints.set(id, ep)
+          logInterfaceCM(id, '->', ep)
+        }
+      } catch (e) {
+        logInterfaceCM(id, 'offline')
+      } finally {
+        lazyTimeouts.delete(id)
       }
-    }
-  } catch (e) {
-    endpoints.delete(id)
-  }
+    }, lazyDelay),
+    running: false
+  })
 }
 
-async function testConn (endpoint: string, id: string) {
+async function trickyTestConn (endpoint: string, id: string) {
+  let result: boolean
   try {
-    const result = <boolean> await get(`http://${endpoint}/${id}`, { json: true, timeout: 1000 })
-    return result
+    result = await get(`http://${endpoint}/${id}`, { json: true, timeout: 1000 })
   } catch (e) {
-    return false
+    // logInterfaceCM('Test', endpoint, 'failed')
+    return
   }
+  if (typeof result === 'boolean' && result) throw endpoint // That's the trick
 }
 
 bus.on('system', (msg) => {
   if (msg.event === 'online' || msg.event === 'offline') {
     const deviceID = <string>msg.deviceID
-    updateDeviceLazy(deviceID)
+    updateDevice(deviceID)
   }
 })
 
@@ -56,15 +61,10 @@ localHost.builtin.register('update_ep', async function (args) {
   if (typeof device !== 'string') throw new Error('Bad Arg: device')
   if (alter && typeof alter !== 'string') throw new Error('Bad Arg: alter')
   if (alter) {
-    cancelDeviceUpdate(device)
-    if (await testConn(alter, device)) {
-      endpoints.set(device, alter)
-      logInterfaceCM(device, '->', alter)
-      return true
-    }
-    return false
+    updateDevice(device, [alter])
+    return true
   } else {
-    updateDeviceLazy(device)
+    updateDevice(device)
     return true
   }
 })

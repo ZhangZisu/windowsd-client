@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-import { updateDeviceLazy } from '@/interface/cm'
+import { updateDevice } from '@/interface/cm'
 import { cliArgs } from '@/shared/cli'
 import { invoke, localHost, startupDone } from '@/router'
 import { updateDNS } from './interface/dns'
@@ -17,7 +17,7 @@ async function startup () {
     for (const { id } of devices) {
       if (id === cliArgs.device) continue
       try {
-        updateDeviceLazy(id)
+        updateDevice(id)
         await updateDNS(id)
       } catch (e) {
         logStartup(id, chalk.red('DO NOT support DNS'))
